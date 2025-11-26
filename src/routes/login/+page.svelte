@@ -49,8 +49,8 @@
 			console.log("check cookite js")
 			console.log(cookieToken);
 			// Redirect to merchant profile page if merchant_id is available
-			if (res.merchant_id) {
-				goto(`/merchants/${res.merchant_id}/profile`);
+			if (res.id) {
+				goto(`/users/${res.id}/profile`);
 			} else {
 				goto('/');
 			}
@@ -74,7 +74,7 @@
 		<div class="w-full max-w-md space-y-8">
 			<!-- Page Heading -->
 			<div>
-				<h1 class="text-center text-4xl font-black leading-tight tracking-[-0.033em] text-gray-900 dark:text-white">Sign In to Your Account</h1>
+				<h1 class="text-center text-4xl font-black leading-tight tracking-[-0.033em]">Sign In to Your Account</h1>
 			</div>
 			
 			<!-- Form Card -->
@@ -82,10 +82,10 @@
 				<form on:submit|preventDefault={handleLogin} class="space-y-6" method="POST">
 					<!-- Email/Username Field -->
 					<div class="flex flex-col">
-						<label class="text-base font-medium leading-normal pb-2 text-gray-800 dark:text-white" for="email-username">Email or Username</label>
+						<label class="text-base font-medium leading-normal pb-2" for="email-username">Email or Username</label>
 						<input 
 							autocomplete="username" 
-							class="form-input w-full resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white/10 dark:bg-black/20 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-inset focus:ring-primary focus:border-primary" 
+							class="form-input w-full resize-none overflow-hidden rounded-lg h-14 p-4 text-base font-normal bg-white/10 dark:bg-gray-800 border border-gray-300 dark:border-blue-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 focus:border-blue-600" 
 							id="email-username" 
 							name="email-username" 
 							placeholder="Enter your email or username" 
@@ -97,11 +97,11 @@
 					
 					<!-- Password Field -->
 					<div class="flex flex-col">
-						<label class="text-base font-medium leading-normal pb-2 text-gray-800 dark:text-white" for="password">Password</label>
+						<label class="text-base font-medium leading-normal pb-2" for="password">Password</label>
 						<div class="relative">
 							<input 
 								autocomplete="current-password" 
-								class="form-input w-full resize-none overflow-hidden rounded-lg h-14 p-4 pr-12 text-base font-normal text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white/10 dark:bg-black/20 border border-gray-300 dark:border-gray-700 focus:ring-2 focus:ring-inset focus:ring-primary focus:border-primary" 
+								class="form-input w-full resize-none overflow-hidden rounded-lg h-14 p-4 pr-12 text-base font-normal bg-white/10 dark:bg-gray-800 border border-gray-300 dark:border-blue-700 focus:ring-2 focus:ring-inset focus:ring-blue-600 focus:border-blue-600" 
 								id="password" 
 								name="password" 
 								placeholder="Enter your password" 
@@ -111,7 +111,7 @@
 								bind:value={password}
 							/>
 							<button 
-								class="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" 
+								class="absolute inset-y-0 right-0 flex items-center pr-4" 
 								type="button"
 								on:click={togglePasswordVisibility}
 							>
@@ -122,13 +122,13 @@
 					
 					<!-- Forgot Password Link -->
 					<div class="flex items-center justify-end">
-						<a class="text-sm font-normal text-primary hover:underline" href="/forgot-password">Forgot Password?</a>
+						<a class="text-sm font-normal hover:underline" href="/forgot-password">Forgot Password?</a>
 					</div>
 					
 					<!-- Sign In Button -->
 					<div>
 						<button 
-							class="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors" 
+							class="w-full flex justify-center py-4 px-4 border border-transparent rounded-lg shadow-sm text-base font-bold bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors" 
 							type="submit"
 						>
 							Sign In
@@ -138,9 +138,9 @@
 				
 				<!-- Create Account Link -->
 				<div class="text-center">
-					<p class="text-sm text-gray-600 dark:text-gray-400">
+					<p class="text-sm">
 						Don't have an account?
-						<a class="font-bold text-primary hover:underline" href="/signup">Create one</a>
+						<a class="font-bold hover:underline" href="/signup">Create one</a>
 					</p>
 				</div>
 			</div>

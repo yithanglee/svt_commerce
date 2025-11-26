@@ -128,7 +128,7 @@
 								</svg>
 							</div>
 							<input 
-								class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#212f4a] focus:border-none h-full placeholder:text-[#8ea3cc] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" 
+								class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border-none bg-[#212f4a] focus:border-none h-full placeholder:text-[#8ea3cc] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" 
 								placeholder="Search items" 
 								bind:value={searchQuery}
 								on:input={handleSearch}
@@ -137,7 +137,7 @@
 					</label>
 				</div>
 				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Categories</h3>
+				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Categories</h3>
 				<div class="px-4">
 					{#each categories as category (category.id)}
 						<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
@@ -147,16 +147,16 @@
 								checked={selectedCategories.includes(category.id)}
 								on:change={() => toggleCategory(category.id)}
 							/>
-							<p class="text-white text-base font-normal leading-normal">{category.name}</p>
+							<p class="text-base font-normal leading-normal">{category.name}</p>
 						</label>
 					{/each}
 				</div>
 				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Price Range</h3>
+				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Price Range</h3>
 				<div class="px-4">
 					<div class="@container">
 						<div class="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row">
-							<p class="text-white text-base font-medium leading-normal w-full shrink-[3]">Price</p>
+							<p class="text-base font-medium leading-normal w-full shrink-[3]">Price</p>
 							<div class="flex h-[38px] w-full pt-1.5 relative">
 								<div class="flex h-1 w-full rounded-sm bg-[#2f436a] relative">
 									<div 
@@ -165,14 +165,14 @@
 									></div>
 									<div class="absolute -left-3 -top-1.5 flex flex-col items-center gap-1">
 										<div class="size-4 rounded-full bg-[#1f68f9]"></div>
-										<p class="text-white text-sm font-normal leading-normal">RM {priceRange.min}</p>
+										<p class="text-sm font-normal leading-normal">RM {priceRange.min}</p>
 									</div>
 									<div 
 										class="absolute -left-3 -top-1.5 flex flex-col items-center gap-1"
 										style="left: {(priceRange.max / maxProductPrice) * 100}%"
 									>
 										<div class="size-4 rounded-full bg-[#1f68f9]"></div>
-										<p class="text-white text-sm font-normal leading-normal">RM {priceRange.max}</p>
+										<p class="text-sm font-normal leading-normal">RM {priceRange.max}</p>
 									</div>
 								</div>
 							</div>
@@ -189,7 +189,7 @@
 					</div>
 				</div>
 				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Condition</h3>
+				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Condition</h3>
 				<div class="px-4">
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
 						<input 
@@ -198,7 +198,7 @@
 							checked={selectedConditions.includes('new')}
 							on:change={() => toggleCondition('new')}
 						/>
-						<p class="text-white text-base font-normal leading-normal">New</p>
+						<p class="text-base font-normal leading-normal">New</p>
 					</label>
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
 						<input 
@@ -207,7 +207,7 @@
 							checked={selectedConditions.includes('like_new')}
 							on:change={() => toggleCondition('like_new')}
 						/>
-						<p class="text-white text-base font-normal leading-normal">Like New</p>
+						<p class="text-base font-normal leading-normal">Like New</p>
 					</label>
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
 						<input 
@@ -216,7 +216,7 @@
 							checked={selectedConditions.includes('used')}
 							on:change={() => toggleCondition('used')}
 						/>
-						<p class="text-white text-base font-normal leading-normal">Used</p>
+						<p class="text-base font-normal leading-normal">Used</p>
 					</label>
 				</div>
 			</div>
@@ -224,7 +224,7 @@
 			<!-- Main Content -->
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
 				<div class="flex flex-wrap justify-between gap-3 p-4">
-					<p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Shop Second-Hand</p>
+					<p class="tracking-light text-[32px] font-bold leading-tight min-w-72">Shop Second-Hand</p>
 				</div>
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
 					{#each filteredProducts as product (product.id)}
@@ -237,7 +237,7 @@
 								style='background-image: url("{product.img_url || '/placeholder.png'}");'
 							></div>
 							<div>
-								<p class="text-white text-base font-medium leading-normal">{product.name}</p>
+								<p class="text-base font-medium leading-normal">{product.name}</p>
 								<p class="text-[#8ea3cc] text-sm font-normal leading-normal">RM {product.retail_price}</p>
 							</div>
 						</button>

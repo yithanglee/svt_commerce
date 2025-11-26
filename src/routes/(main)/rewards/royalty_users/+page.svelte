@@ -22,7 +22,7 @@
 			action="javascript:void(0);"
 			on:submit|preventDefault={fetchData}
 		>
-			<h3 class="text-xl font-medium text-gray-900 dark:text-white">Monthly Royalty Bonus</h3>
+			<h3 class="text-xl font-medium dark:">Monthly Royalty Bonus</h3>
 
 			<Label class="space-y-2">
 				<span>Month-Year</span>

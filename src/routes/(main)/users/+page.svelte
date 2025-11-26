@@ -158,7 +158,7 @@
 				action="javascript:void(0);"
 				on:submit|preventDefault={fetchData3}
 			>
-				<h3 class="text-xl font-medium text-gray-900 dark:text-white">Modify referral</h3>
+				<h3 class="text-xl font-medium dark:">Modify referral</h3>
 
 				<Label class="space-y-2">
 					<span>Username</span>
@@ -184,7 +184,7 @@
 				action="javascript:void(0);"
 				on:submit|preventDefault={fetchData2}
 			>
-				<h3 class="text-xl font-medium text-gray-900 dark:text-white">Modify placement</h3>
+				<h3 class="text-xl font-medium dark:">Modify placement</h3>
 
 				<Label class="space-y-2">
 					<span>Username</span>
@@ -215,7 +215,7 @@
 				action="javascript:void(0);"
 				on:submit|preventDefault={fetchData}
 			>
-				<h3 class="text-xl font-medium text-gray-900 dark:text-white">
+				<h3 class="text-xl font-medium dark:">
 					Register Member Without Products
 				</h3>
 				<Label class="space-y-2">
