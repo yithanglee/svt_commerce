@@ -31,7 +31,7 @@
 	];
 </script>
 
-<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-[#101623] overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
 	<div class="layout-container flex h-full grow flex-col">
 		<!-- Header -->
 		<Header 
@@ -53,23 +53,23 @@
 					>
 						<div class="flex flex-col gap-2 text-center">
 							<h1
-								class="text-4xl sm:text-5xl font-black leading-tight tracking-[-0.033em]"
+								class="text-white text-4xl sm:text-5xl font-black leading-tight tracking-[-0.033em]"
 							>
 								Find your next treasure
 							</h1>
-							<h2 class="text-sm sm:text-base font-normal leading-normal">
+							<h2 class="text-white text-sm sm:text-base font-normal leading-normal">
 								Discover unique, pre-loved items and give them a new home. Shop sustainably and find amazing deals on everything from fashion to furniture.
 							</h2>
 						</div>
 						<div class="flex-wrap gap-3 flex justify-center">
 							<button
-								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 sm:h-12 px-4 sm:px-5 bg-blue-600 text-sm sm:text-base font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors"
+								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 sm:h-12 px-4 sm:px-5 bg-[#0da6f2] text-white text-sm sm:text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0b8cc9] transition-colors"
 								on:click={goToShop}
 							>
 								<span class="truncate">Shop Now</span>
 							</button>
 							<button
-								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 sm:h-12 px-4 sm:px-5 bg-blue-800 text-sm sm:text-base font-bold leading-normal tracking-[0.015em] hover:bg-blue-900 transition-colors"
+								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 sm:h-12 px-4 sm:px-5 bg-[#223c49] text-white text-sm sm:text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#2a4855] transition-colors"
 								on:click={goToShop}
 							>
 								<span class="truncate">Sell Your Item</span>
@@ -79,7 +79,7 @@
 				</div>
 				
 				<!-- Shop by Category -->
-				<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Shop by Category</h2>
+				<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Shop by Category</h2>
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
 					{#each categories.slice(0, 6) as category (category.id)}
 						<button
@@ -90,13 +90,13 @@
 								class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg"
 								style='background-image: url("{category.img_url || '/placeholder.png'}");'
 							></div>
-							<p class="text-base font-medium leading-normal">{category.name}</p>
+							<p class="text-white text-base font-medium leading-normal">{category.name}</p>
 						</button>
 					{/each}
 				</div>
 				
 				<!-- Featured Listings -->
-				<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Listings</h2>
+				<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Listings</h2>
 				<div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 					<div class="flex items-stretch p-4 gap-3">
 						{#each products as product (product.id)}
@@ -109,9 +109,9 @@
 									style='background-image: url("{PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url || '/placeholder.png'}");'
 								></div>
 								<div>
-									<p class="text-base font-medium leading-normal">{product.name}</p>
-									<p class="text-sm font-normal leading-normal">{product.desc || 'Excellent condition'}</p>
-									<p class="text-sm font-semibold leading-normal mt-1">RM {product.retail_price}</p>
+									<p class="text-white text-base font-medium leading-normal">{product.name}</p>
+									<p class="text-[#90b7cb] text-sm font-normal leading-normal">{product.desc || 'Excellent condition'}</p>
+									<p class="text-white text-sm font-semibold leading-normal mt-1">RM {product.retail_price}</p>
 								</div>
 							</button>
 						{/each}

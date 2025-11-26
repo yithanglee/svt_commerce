@@ -78,7 +78,7 @@
 		const statusMap = {
 			'pending_confirmation': { text: 'Pending Confirmation', class: 'bg-yellow-500/20 text-yellow-400' },
 			'pending_payment': { text: 'Pending Payment', class: 'bg-orange-500/20 text-orange-400' },
-			'processing': { text: 'Processing', class: 'bg-blue-500/20' },
+			'processing': { text: 'Processing', class: 'bg-blue-500/20 text-blue-400' },
 			'pending_delivery': { text: 'Pending Delivery', class: 'bg-purple-500/20 text-purple-400' },
 			'sent': { text: 'Sent', class: 'bg-green-500/20 text-green-400' },
 			'in_transit': { text: 'In Transit', class: 'bg-yellow-500/20 text-yellow-400' },
@@ -86,7 +86,7 @@
 			'complete': { text: 'Delivered', class: 'bg-green-500/20 text-green-400' },
 			'cancelled': { text: 'Cancelled', class: 'bg-red-500/20 text-red-400' }
 		};
-		return statusMap[status] || { text: status || 'Unknown', class: 'bg-gray-500/20' };
+		return statusMap[status] || { text: status || 'Unknown', class: 'bg-gray-500/20 text-gray-400' };
 	}
 	
 	function getTrackingSteps(status, orderDate) {
@@ -150,18 +150,18 @@
 							style="background-image: url('{userAvatar}');"
 						></div>
 					{:else}
-						<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-primary flex items-center justify-center font-bold">
+						<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 bg-primary flex items-center justify-center text-white font-bold">
 							{userInitials}
 						</div>
 					{/if}
 					<div class="flex flex-col">
-						<h1 class="text-base font-medium leading-normal">{userName}</h1>
+						<h1 class="text-white text-base font-medium leading-normal">{userName}</h1>
 						<p class="text-slate-400 text-sm font-normal leading-normal">{userEmail}</p>
 					</div>
 				</div>
 				<nav class="flex flex-col gap-2 mt-4">
 					<button 
-						class="flex items-center gap-3 px-3 py-2 rounded-lg {activeTab === 'profile' ? 'bg-primary/30 text-primary' : 'text-slate-300 hover:bg-primary/20 hover:'} transition-colors duration-200 w-full text-left" 
+						class="flex items-center gap-3 px-3 py-2 rounded-lg {activeTab === 'profile' ? 'bg-primary/30 text-primary' : 'text-slate-300 hover:bg-primary/20 hover:text-white'} transition-colors duration-200 w-full text-left" 
 						type="button"
 						on:click={() => activeTab = 'profile'}
 					>
@@ -169,7 +169,7 @@
 						<p class="text-sm font-medium leading-normal">Profile</p>
 					</button>
 					<button 
-						class="flex items-center gap-3 px-3 py-2 rounded-lg {activeTab === 'orders' ? 'bg-primary/30 text-primary' : 'text-slate-300 hover:bg-primary/20 hover:'} transition-colors duration-200 w-full text-left" 
+						class="flex items-center gap-3 px-3 py-2 rounded-lg {activeTab === 'orders' ? 'bg-primary/30 text-primary' : 'text-slate-300 hover:bg-primary/20 hover:text-white'} transition-colors duration-200 w-full text-left" 
 						type="button"
 						on:click={() => { activeTab = 'orders'; ordersSubTab = 'active'; }}
 					>
@@ -177,14 +177,14 @@
 						<p class="text-sm font-medium leading-normal">Orders</p>
 					</button>
 					<button 
-						class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover: transition-colors duration-200 w-full text-left" 
+						class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover:text-white transition-colors duration-200 w-full text-left" 
 						type="button"
 					>
 						<span class="material-symbols-outlined">settings</span>
 						<p class="text-sm font-medium leading-normal">Settings</p>
 					</button>
 					<button 
-						class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover: transition-colors duration-200 w-full text-left" 
+						class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-300 hover:bg-primary/20 hover:text-white transition-colors duration-200 w-full text-left" 
 						type="button"
 					>
 						<span class="material-symbols-outlined">help</span>
@@ -216,7 +216,7 @@
 				{#if activeTab === 'profile'}
 					<!-- Profile Section -->
 					<div class="flex flex-wrap justify-between gap-3 mb-8">
-						<p class="text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">My Profile</p>
+						<p class="text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">My Profile</p>
 					</div>
 					<div class="bg-[#15202b] border border-slate-700 rounded-xl p-6 md:p-8">
 						<div class="flex items-center gap-6 mb-8 pb-8 border-b border-slate-700">
@@ -226,33 +226,33 @@
 									style="background-image: url('{userAvatar}');"
 								></div>
 							{:else}
-								<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0 bg-primary flex items-center justify-center font-bold text-2xl">
+								<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-24 shrink-0 bg-primary flex items-center justify-center text-white font-bold text-2xl">
 									{userInitials}
 								</div>
 							{/if}
 							<div class="flex flex-col">
-								<h2 class="text-2xl font-bold">{userName}</h2>
+								<h2 class="text-2xl font-bold text-white">{userName}</h2>
 								<p class="text-slate-400">Member since {memberSince}</p>
 							</div>
 						</div>
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 							<div>
 								<label class="block mb-2 text-sm font-medium text-slate-400" for="full-name">Full Name</label>
-								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg" id="full-name">{userName}</p>
+								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg text-white" id="full-name">{userName}</p>
 							</div>
 							<div>
 								<label class="block mb-2 text-sm font-medium text-slate-400" for="phone-number">Phone Number</label>
-								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg" id="phone-number">{userPhone}</p>
+								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg text-white" id="phone-number">{userPhone}</p>
 							</div>
 							<div class="md:col-span-2">
 								<label class="block mb-2 text-sm font-medium text-slate-400" for="email">Email Address</label>
-								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg" id="email">{userEmail}</p>
+								<p class="py-2.5 px-4 block w-full bg-[#101922] border border-slate-600 rounded-lg text-white" id="email">{userEmail}</p>
 							</div>
 							<div class="md:col-span-2">
 								<div class="block mb-2 text-sm font-medium text-slate-400">Active Token Balance</div>
 								<div class="flex items-center gap-3 py-2.5 px-4 bg-primary/10 border border-primary/30 rounded-lg">
 									<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">stars</span>
-									<p class="font-semibold text-lg">{memberPoints.toLocaleString()} TP</p>
+									<p class="text-white font-semibold text-lg">{memberPoints.toLocaleString()} TP</p>
 								</div>
 							</div>
 						</div>
@@ -260,20 +260,20 @@
 				{:else if activeTab === 'orders'}
 					<!-- Orders Section -->
 					<div class="flex flex-wrap justify-between gap-3 mb-6">
-						<p class="text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">My Orders</p>
+						<p class="text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">My Orders</p>
 					</div>
 					
 					<!-- Tabs -->
 					<div class="pb-3">
 						<div class="flex border-b border-slate-700 gap-8">
 							<button 
-								class="flex flex-col items-center justify-center border-b-[3px] {ordersSubTab === 'active' ? 'border-b-primary' : 'border-b-transparent text-slate-400'} pb-[13px] pt-4 hover: transition-colors"
+								class="flex flex-col items-center justify-center border-b-[3px] {ordersSubTab === 'active' ? 'border-b-primary text-white' : 'border-b-transparent text-slate-400'} pb-[13px] pt-4 hover:text-white transition-colors"
 								on:click={() => ordersSubTab = 'active'}
 							>
 								<p class="text-sm font-bold leading-normal tracking-[0.015em]">Active Orders</p>
 							</button>
 							<button 
-								class="flex flex-col items-center justify-center border-b-[3px] {ordersSubTab === 'history' ? 'border-b-primary' : 'border-b-transparent text-slate-400'} pb-[13px] pt-4 hover: transition-colors"
+								class="flex flex-col items-center justify-center border-b-[3px] {ordersSubTab === 'history' ? 'border-b-primary text-white' : 'border-b-transparent text-slate-400'} pb-[13px] pt-4 hover:text-white transition-colors"
 								on:click={() => ordersSubTab = 'history'}
 							>
 								<p class="text-sm font-bold leading-normal tracking-[0.015em]">Order History</p>
@@ -292,18 +292,18 @@
 								<details class="flex flex-col rounded-lg border border-slate-700 bg-[#15202b] px-5 py-3 group" open={order === activeOrders[0]}>
 									<summary class="flex cursor-pointer items-center justify-between gap-6 py-2 list-none">
 										<div class="flex items-center gap-4">
-											<p class="text-base font-bold leading-normal">Order #{order.id || 'N/A'}</p>
+											<p class="text-white text-base font-bold leading-normal">Order #{order.id || 'N/A'}</p>
 											<span class="inline-flex items-center rounded-full {statusBadge.class} px-3 py-1 text-xs font-medium">
 												{statusBadge.text}
 											</span>
 										</div>
 										<div class="flex items-center gap-6">
 											<p class="text-slate-400 text-sm">Order Date: {formatDate(order.inserted_at || order.sale_date)}</p>
-											<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+											<span class="material-symbols-outlined text-white group-open:rotate-180 transition-transform">expand_more</span>
 										</div>
 									</summary>
 									<div class="border-t border-slate-700 mt-4 pt-4">
-										<h3 class="text-lg font-semibold mb-4">Tracking Details</h3>
+										<h3 class="text-lg font-semibold text-white mb-4">Tracking Details</h3>
 										<div class="flex gap-8">
 											{#if orderDetails.product_image}
 												<img 
@@ -317,7 +317,7 @@
 												</div>
 											{/if}
 											<div class="flex-1">
-												<p class="font-medium">{orderDetails.product_name}</p>
+												<p class="text-white font-medium">{orderDetails.product_name}</p>
 												<p class="text-slate-400 text-sm mt-1">
 													Quantity: {orderDetails.quantity} × {formatPrice(orderDetails.product_price)}
 												</p>
@@ -327,7 +327,7 @@
 													</p>
 												{/if}
 												<p class="text-slate-400 text-sm mt-1">
-													Total: <span class="font-semibold">{formatPrice(order.grand_total || order.subtotal)}</span>
+													Total: <span class="text-white font-semibold">{formatPrice(order.grand_total || order.subtotal)}</span>
 												</p>
 												<!-- Progress Stepper -->
 												<ol class="items-center w-full space-y-4 sm:flex sm:space-x-8 sm:space-y-0 rtl:space-x-reverse mt-5">
@@ -341,7 +341,7 @@
 																{/if}
 															</span>
 															<div>
-																<h3 class="font-medium leading-tight {step.completed ? '' : ''}">{step.label}</h3>
+																<h3 class="font-medium leading-tight {step.completed ? 'text-white' : ''}">{step.label}</h3>
 																<p class="text-xs {step.completed ? 'text-slate-400' : 'text-slate-500'}">{step.date}</p>
 															</div>
 														</li>
@@ -354,11 +354,11 @@
 							{:else}
 								<div class="text-center py-20 border-2 border-dashed border-slate-700 rounded-xl mt-6">
 									<span class="material-symbols-outlined text-5xl text-slate-500 mx-auto">local_mall</span>
-									<h3 class="mt-4 text-xl font-semibold">No Active Orders</h3>
+									<h3 class="mt-4 text-xl font-semibold text-white">No Active Orders</h3>
 									<p class="mt-1 text-sm text-slate-400">When you place an order, its tracking information will appear here.</p>
 									<button 
 										type="button" 
-										class="mt-6 bg-primary hover:bg-primary/90 font-medium rounded-lg text-sm px-5 py-2.5"
+										class="mt-6 text-white bg-primary hover:bg-primary/90 font-medium rounded-lg text-sm px-5 py-2.5"
 										on:click={() => goto('/shop')}
 									>
 										Start Shopping
@@ -370,7 +370,7 @@
 					{:else if ordersSubTab === 'history'}
 						<!-- Order History Section -->
 					<div class="flex flex-col mt-12">
-						<h2 class="text-2xl font-bold leading-tight tracking-[-0.015em] mb-4">Order History</h2>
+						<h2 class="text-white text-2xl font-bold leading-tight tracking-[-0.015em] mb-4">Order History</h2>
 						<div class="relative overflow-x-auto rounded-lg border border-slate-700">
 							<table class="w-full text-sm text-left text-slate-300">
 								<thead class="text-xs text-slate-400 uppercase bg-[#15202b]">
@@ -388,7 +388,7 @@
 										{@const orderDetails = parseOrderDetails(order)}
 										{@const statusBadge = getStatusBadge(order.status)}
 										<tr class="bg-[#15202b]/50 border-b border-slate-700 hover:bg-[#1f2937] transition-colors">
-											<th class="px-6 py-4 font-medium whitespace-nowrap" scope="row">
+											<th class="px-6 py-4 font-medium text-white whitespace-nowrap" scope="row">
 												#{order.id || 'N/A'}
 											</th>
 											<td class="px-6 py-4">{formatDate(order.inserted_at || order.sale_date)}</td>
