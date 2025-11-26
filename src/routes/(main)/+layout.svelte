@@ -28,6 +28,7 @@
 	import Cookies from 'js-cookie';
 	import { onDestroy, onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { isToastOpen } from '$lib/stores/toast';
 
 	let styles = ['sidebar', 'drawer'],
 		display_title = 'Profile',
@@ -55,11 +56,12 @@
 		Cookies.remove(PHX_COOKIE);
 
 		setTimeout(() => {
-			goto('/');
+			goto('/login');
 		}, 200);
 	}
 
 	function relogin() {
+		isToastOpen.notify('Close this window and re login!');
 		logout();
 	}
 	async function syncMenusToServer() {
@@ -111,7 +113,7 @@
 									<svelte:fragment slot="icon">
 										<Icon
 											name="user-solid"
-											class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+											class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 										/>
 									</svelte:fragment>
 								</SidebarItem>
@@ -123,7 +125,7 @@
 									<svelte:fragment slot="icon">
 										<Icon
 											name="chart-pie-solid"
-											class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+											class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 										/>
 									</svelte:fragment>
 								</SidebarItem>
@@ -137,7 +139,7 @@
 									<svelte:fragment slot="icon">
 										<Icon
 											name="chart-pie-solid"
-											class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+											class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 										/>
 									</svelte:fragment>
 								</SidebarItem>
@@ -150,7 +152,7 @@
 													<svelte:fragment slot="icon">
 														<Icon
 															name="clipboard-solid"
-															class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+															class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 														/>
 													</svelte:fragment>
 													{#each menu.children as child}
@@ -174,7 +176,7 @@
 												<svelte:fragment slot="icon">
 													<Icon
 														name={menu.icon == null ? 'users-solid' : menu.icon}
-														class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+														class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 													/>
 												</svelte:fragment>
 											</SidebarItem>
@@ -186,7 +188,7 @@
 									<svelte:fragment slot="icon">
 										<Icon
 											name="arrow-right-to-bracket-solid"
-											class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+											class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 										/>
 									</svelte:fragment>
 								</SidebarItem>
@@ -205,11 +207,11 @@
 			<div class="flex items-center">
 				<h5
 					id="drawer-navigation-label-3"
-					class="text-base font-semibold text-gray-500 uppercase dark:text-gray-400"
+					class="text-base font-semibold uppercase"
 				>
 					Menu
 				</h5>
-				<CloseButton on:click={() => (hidden2 = true)} class="mb-4 dark:text-white" />
+				<CloseButton on:click={() => (hidden2 = true)} class="mb-4 dark:" />
 			</div>
 			<Sidebar>
 				<SidebarWrapper>
@@ -218,7 +220,7 @@
 							<svelte:fragment slot="icon">
 								<Icon
 									name="user-solid"
-									class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+									class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 								/>
 							</svelte:fragment>
 						</SidebarItem>
@@ -230,7 +232,7 @@
 							<svelte:fragment slot="icon">
 								<Icon
 									name="chart-pie-solid"
-									class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+									class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 								/>
 							</svelte:fragment>
 						</SidebarItem>
@@ -244,7 +246,7 @@
 							<svelte:fragment slot="icon">
 								<Icon
 									name="chart-pie-solid"
-									class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+									class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 								/>
 							</svelte:fragment>
 						</SidebarItem>
@@ -257,7 +259,7 @@
 											<svelte:fragment slot="icon">
 												<Icon
 													name="clipboard-solid"
-													class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+													class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 												/>
 											</svelte:fragment>
 											{#each menu.children as child}
@@ -281,7 +283,7 @@
 										<svelte:fragment slot="icon">
 											<Icon
 												name={menu.icon == null ? 'users-solid' : menu.icon}
-												class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+												class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 											/>
 										</svelte:fragment>
 									</SidebarItem>
@@ -293,7 +295,7 @@
 							<svelte:fragment slot="icon">
 								<Icon
 									name="arrow-right-to-bracket-solid"
-									class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+									class="w-5 h-5 transition duration-75 group-hover: dark:group-hover:"
 								/>
 							</svelte:fragment>
 						</SidebarItem>
@@ -302,25 +304,6 @@
 			</Sidebar>
 		</Drawer>
 
-		<div class="mx-auto flex flex-wrap justify-between items-center container">
-			<Button on:click={() => (hidden2 = false)} class="!p-2 mb-4 mt-0 opacity-25">Menu</Button>
-			<div class="w-full grid grid-cols-12 shadow-lg p-4 rounded">
-				<div class="col-span-12 py-4 sm:py-0" style="padding: 0 2vw;">
-					<div class="py-4">
-						<Breadcrumb aria-label="Default breadcrumb example ">
-							<BreadcrumbItem href={profileRoute} home>Home</BreadcrumbItem>
-							<BreadcrumbItem href={display_href}>{display_title}</BreadcrumbItem>
-						</Breadcrumb>
-
-						<h1
-							class=" mt-4 w-full text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl"
-						>
-							{display_title}
-						</h1>
-					</div>
-					<slot />
-				</div>
-			</div>
-		</div>
+		<slot />
 	{/if}
 {/if}

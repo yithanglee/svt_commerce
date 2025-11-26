@@ -72,7 +72,7 @@
 				action="javascript:void(0);"
 				on:submit|preventDefault={fetchData}
 			>
-				<h3 class="text-xl font-medium text-gray-900 dark:text-white">Admin Insert Transaction</h3>
+				<h3 class="text-xl font-medium dark:">Admin Insert Transaction</h3>
 
 				<Input type="hidden" name="ewallet_id" value={data.id} placeholder="" />
 

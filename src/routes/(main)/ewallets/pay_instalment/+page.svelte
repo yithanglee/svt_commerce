@@ -14,7 +14,7 @@
 				var checked = v.total > data.product.retail_price;
 				if (data.product.can_pay_by_drp && v.wallet_type == 'direct_recruitment') {
 					list.push(
-						`<tr class="text-gray-500">
+						`<tr class="">
 							<td  class="border-t text-right">` +
 													v.wallet_type +
 													`</td>
@@ -36,7 +36,7 @@
 				}
 				if ( v.wallet_type != 'direct_recruitment') {
 					list.push(
-						`<tr class="text-gray-500">
+						`<tr class="">
 							<td  class="border-t text-right">` +
 													v.wallet_type +
 													`</td>
@@ -79,7 +79,7 @@
 			true,
 			`	<span class="">Will deduct sponsor's ewallet to mark the instalment as paid.</span>
 				<label class="	text-left my-4 text-sm font-medium block 
-								text-gray-900 dark:text-gray-300 space-y-2">
+								 space-y-2">
 								Instalment amount: RP ` +
 				data.product.retail_price.toFixed(2) +
 				` 
@@ -102,7 +102,7 @@
 					<input 	name="password" placeholder="" type="text" 
 							class="	block w-75 disabled:cursor-not-allowed disabled:opacity-50 p-2.5 
 									focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 
-									dark:focus:ring-primary-500 bg-gray-50 text-gray-900 dark:bg-gray-600 dark:text-white 
+									dark:focus:ring-primary-500 bg-gray-50 dark:bg-gray-600 dark: 
 									dark:placeholder-gray-400 border-gray-300 dark:border-gray-500 text-sm rounded-lg"> 
 				</div>
 				

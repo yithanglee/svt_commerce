@@ -53,9 +53,9 @@
 			true,
 			`
         <label class="my-4 text-sm font-medium block 
-        text-gray-900 dark:text-gray-300 space-y-2">
+        space-y-2">
         <span>Shipping Ref</span>  <input name="shipping_ref" 
-        placeholder="" type="text" class="block w-75 disabled:cursor-not-allowed disabled:opacity-50 p-2.5 focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 dark:focus:ring-primary-500 bg-gray-50 text-gray-900 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400 border-gray-300 dark:border-gray-500 text-sm rounded-lg"> </label>
+        placeholder="" type="text" class="block w-75 disabled:cursor-not-allowed disabled:opacity-50 p-2.5 focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 dark:focus:ring-primary-500 bg-gray-50 dark:bg-gray-600 dark: dark:placeholder-gray-400 border-gray-300 dark:border-gray-500 text-sm rounded-lg"> </label>
         <span class="">Are you sure to mark this order as sent?</span>`,
 			() => {
 				var dom = document.querySelector("input[name='shipping_ref']");

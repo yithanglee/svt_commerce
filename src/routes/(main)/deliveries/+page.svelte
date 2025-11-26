@@ -66,9 +66,9 @@
 			true,
 			`
 			<label class="my-4 text-sm font-medium block 
-			text-gray-900 dark:text-gray-300 space-y-2">
+			 space-y-2">
 			<span>Shipping Ref</span>  <input name="shipping_ref" 
-			placeholder="" type="text" class="block w-75 disabled:cursor-not-allowed disabled:opacity-50 p-2.5 focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 dark:focus:ring-primary-500 bg-gray-50 text-gray-900 dark:bg-gray-600 dark:text-white dark:placeholder-gray-400 border-gray-300 dark:border-gray-500 text-sm rounded-lg"> </label>
+			placeholder="" type="text" class="block w-75 disabled:cursor-not-allowed disabled:opacity-50 p-2.5 focus:border-primary-500 focus:ring-primary-500 dark:focus:border-primary-500 dark:focus:ring-primary-500 bg-gray-50 dark:bg-gray-600 dark: dark:placeholder-gray-400 border-gray-300 dark:border-gray-500 text-sm rounded-lg"> </label>
 			<span class="">Are you sure to mark this order as sent?</span>`,
 			() => {
 				var dom = document.querySelector("input[name='shipping_ref']");
@@ -117,7 +117,7 @@
 
 <Modal bind:open={formModal} size="lg" autoclose={false} class="w-full" outsideclose>
 	<form class="flex flex-col space-y-6" id="currentForm" action="#">
-		<h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">Confirmation</h3>
+		<h3 class="mb-4 text-xl font-medium dark:">Confirmation</h3>
 		<p class="">Are you sure to mark this order as sent?</p>
 		<div
 			class="p-4 bg-gray-50 rounded-lg dark:bg-gray-800 mt-4"
