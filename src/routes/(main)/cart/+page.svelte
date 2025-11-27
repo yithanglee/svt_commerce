@@ -71,46 +71,46 @@
 		<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
 			<!-- Breadcrumb -->
 			<div class="flex flex-wrap gap-2 p-4">
-				<a href="/shop" class="text-base font-medium leading-normal transition-colors">Shop</a>
-				<span class="text-base font-medium leading-normal">/</span>
-				<span class="text-base font-medium leading-normal">Cart</span>
+				<a href="/shop" class="text-blue-300 text-base font-medium leading-normal hover:text-white transition-colors">Shop</a>
+				<span class="text-blue-300 text-base font-medium leading-normal">/</span>
+				<span class="text-white text-base font-medium leading-normal">Cart</span>
 			</div>
 			
 			<!-- Page Title -->
 			<div class="flex flex-wrap justify-between gap-3 p-4">
-				<p class="tracking-light text-[32px] font-bold leading-tight min-w-72">Your Cart</p>
+				<p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Your Cart</p>
 			</div>
 			
 			{#if items.length === 0}
 				<div class="p-4">
-					<p class="text-base font-normal leading-normal">Your cart is empty.</p>
+					<p class="text-blue-300 text-base font-normal leading-normal">Your cart is empty.</p>
 				</div>
 			{:else}
 				<!-- Items in Cart -->
-				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Items in Cart</h3>
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Items in Cart</h3>
 				<div class="space-y-0">
 					{#each items as item (item.product_id)}
 						<div class="flex gap-4 bg-gray-900 px-4 py-3">
 							<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-[70px] w-[70px] h-[70px]" style='background-image: url("{ getImageUrl(item.img_url) || '/placeholder.png'}")'></div>
 							<div class="flex flex-1 flex-col justify-center">
-								<p class="text-base font-medium leading-normal">{item.name}</p>
+								<p class="text-white text-base font-medium leading-normal">{item.name}</p>
 								{#if item.size}
-									<p class="text-sm font-normal leading-normal">Size: {item.size}</p>
+									<p class="text-blue-300 text-sm font-normal leading-normal">Size: {item.size}</p>
 								{/if}
 								<div class="flex items-center gap-2 mt-1">
-									<label for="qty-{item.product_id}" class="text-sm font-normal leading-normal">Qty:</label>
+									<label for="qty-{item.product_id}" class="text-blue-300 text-sm font-normal leading-normal">Qty:</label>
 									<input 
 										id="qty-{item.product_id}" 
 										type="number" 
 										min="1" 
 										value={item.qty} 
 										on:change={(e) => setQty(item.product_id, Number(e.target.value))} 
-										class="w-20 border border-blue-700 bg-gray-800 rounded px-2 py-1 text-sm focus:outline-0 focus:ring-0 focus:border-blue-600" 
+										class="w-20 border  bg-gray-800 text-white rounded px-2 py-1 text-sm focus:outline-0 focus:ring-0 focus:border-blue-600" 
 									/>
 								</div>
 							</div>
 							<button 
-								class="text-sm font-normal leading-normal transition-colors self-center" 
+								class="text-blue-300 text-sm font-normal leading-normal hover:text-white transition-colors self-center" 
 								on:click={() => removeItem(item.product_id)}
 							>
 								Remove
@@ -120,95 +120,95 @@
 				</div>
 				
 				<!-- Shipping Information -->
-				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Information</h3>
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Information</h3>
 				<div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
 					<label class="flex flex-col min-w-40 flex-1">
-						<p class="text-base font-medium leading-normal pb-2">Address</p>
+						<p class="text-white text-base font-medium leading-normal pb-2">Address</p>
 						<input 
 							type="text" 
 							bind:value={address}
 							placeholder="Enter your address" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
 				<div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
 					<label class="flex flex-col min-w-40 flex-1">
-						<p class="text-base font-medium leading-normal pb-2">City</p>
+						<p class="text-white text-base font-medium leading-normal pb-2">City</p>
 						<input 
 							type="text" 
 							bind:value={city}
 							placeholder="Enter your city" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
 				<div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
 					<label class="flex flex-col min-w-40 flex-1">
-						<p class="text-base font-medium leading-normal pb-2">State</p>
+						<p class="text-white text-base font-medium leading-normal pb-2">State</p>
 						<input 
 							type="text" 
 							bind:value={state}
 							placeholder="Enter your state" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 					<label class="flex flex-col min-w-40 flex-1">
-						<p class="text-base font-medium leading-normal pb-2">Zip Code</p>
+						<p class="text-white text-base font-medium leading-normal pb-2">Zip Code</p>
 						<input 
 							type="text" 
 							bind:value={zipCode}
 							placeholder="Enter zip code" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-0 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
 				
 				<!-- Shipping Options -->
-				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Options</h3>
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Options</h3>
 				<div class="flex flex-col gap-3 p-4">
-					<label class="flex items-center gap-4 rounded-lg border border-solid border-blue-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="shipping" 
 							value="standard" 
 							bind:group={shippingOption}
-							class="h-5 w-5 border-2 border-blue-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
-							<p class="text-sm font-medium leading-normal">Standard (5-7 business days)</p>
-							<p class="text-sm font-normal leading-normal">Free</p>
+							<p class="text-white text-sm font-medium leading-normal">Standard (5-7 business days)</p>
+							<p class="text-blue-300 text-sm font-normal leading-normal">Free</p>
 						</div>
 					</label>
-					<label class="flex items-center gap-4 rounded-lg border border-solid border-blue-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="shipping" 
 							value="self_pickup" 
 							bind:group={shippingOption}
-							class="h-5 w-5 border-2 border-blue-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
-							<p class="text-sm font-medium leading-normal">Self Pickup</p>
-							<p class="text-sm font-normal leading-normal">Free</p>
+							<p class="text-white text-sm font-medium leading-normal">Self Pickup</p>
+							<p class="text-blue-300 text-sm font-normal leading-normal">Free</p>
 						</div>
 					</label>
 				</div>
 				
 				<!-- Payment Method -->
-				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Payment Method</h3>
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Payment Method</h3>
 				<div class="flex flex-col gap-3 p-4">
-					<label class="flex items-center gap-4 rounded-lg border border-solid border-blue-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="payment" 
 							value="member_points" 
 							bind:group={paymentMethod}
-							class="h-5 w-5 border-2 border-blue-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
-							<p class="text-sm font-medium leading-normal">Member Points Balance</p>
-							<p class="text-sm font-normal leading-normal">
+							<p class="text-white text-sm font-medium leading-normal">Member Points Balance</p>
+							<p class="text-blue-300 text-sm font-normal leading-normal">
 								{#if isLoadingPoints}
 									Loading...
 								{:else}
@@ -229,26 +229,26 @@
 				{/if}
 				
 				<!-- Order Summary -->
-				<h3 class="text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Order Summary</h3>
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Order Summary</h3>
 				<div class="p-4">
 					<div class="flex justify-between gap-x-6 py-2">
-						<p class="text-sm font-normal leading-normal">Subtotal</p>
-						<p class="text-sm font-normal leading-normal text-right">${subtotal.toFixed(2)}</p>
+						<p class="text-blue-300 text-sm font-normal leading-normal">Subtotal</p>
+						<p class="text-white text-sm font-normal leading-normal text-right">${subtotal.toFixed(2)}</p>
 					</div>
 					<div class="flex justify-between gap-x-6 py-2">
-						<p class="text-sm font-normal leading-normal">Shipping</p>
-						<p class="text-sm font-normal leading-normal text-right">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</p>
+						<p class="text-blue-300 text-sm font-normal leading-normal">Shipping</p>
+						<p class="text-white text-sm font-normal leading-normal text-right">{shippingCost === 0 ? 'Free' : `$${shippingCost.toFixed(2)}`}</p>
 					</div>
 					<div class="flex justify-between gap-x-6 py-2">
-						<p class="text-sm font-normal leading-normal">Total</p>
-						<p class="text-sm font-normal leading-normal text-right">${total.toFixed(2)}</p>
+						<p class="text-blue-300 text-sm font-normal leading-normal">Total</p>
+						<p class="text-white text-sm font-normal leading-normal text-right">${total.toFixed(2)}</p>
 					</div>
 				</div>
 				
 				<!-- Place Order Button -->
 				<div class="flex px-4 py-3 justify-end">
 					<button 
-						class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-blue-600 text-base font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
+						class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-blue-600 text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" 
 						disabled={isSubmitting || insufficientPoints} 
 						on:click={checkout}
 					>

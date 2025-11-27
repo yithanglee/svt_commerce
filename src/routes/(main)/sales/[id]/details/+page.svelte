@@ -6,7 +6,8 @@
 	export let data;
 	
 	const sale = data.sale || {};
-	const user = data.user || {};
+	const orderUser = data.orderUser || {};
+	const user_id = data.user.id;
 	const eWallet = data.eWallet || {};
 	
 	function parseOrderDetails() {
@@ -96,10 +97,6 @@
 	$: shippingFee = sale.shipping_fee || 0;
 	$: grandTotal = sale.grand_total || subtotal + shippingFee;
 	$: totalPV = sale.total_point_value || 0;
-	$: userInitials = getUserInitials(user.username || user.fullname || 'User');
-	$: userAvatar = user.avatar || user.profile_image || '';
-	$: userEmail = user.email || '';
-	$: userName = user.fullname || user.username || 'User';
 </script>
 
 <div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark font-display">
@@ -113,7 +110,7 @@
 						<button 
 							class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-primary mb-2 transition-colors cursor-pointer bg-transparent border-none p-0" 
 							type="button"
-							on:click={() => window.history.back()}
+							on:click={() => goto(`/users/${data.user.id}/profile#orders`)}
 						>
 							<span class="material-symbols-outlined">arrow_back</span>
 							Back to Orders
