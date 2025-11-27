@@ -58,10 +58,7 @@
 	}
 
 	function goToProfile() {
-
-
-
-		if (isLoggedIn && user?.id ) {
+		if (isLoggedIn && user?.id) {
 			goto(`/users/${user.id}/profile`);
 		} else {
 			goto('/login');
@@ -131,8 +128,6 @@
 		<!-- Desktop Navigation -->
 		<div class="hidden md:flex items-center gap-9">
 			{#if hasNavigationItems}
-
-				
 				<!-- Simple Navigation Items -->
 				{#each navigationItems as item}
 					<button class={navLinkClass} on:click={() => goto(item.href)}>
@@ -140,8 +135,6 @@
 					</button>
 				{/each}
 			{/if}
-
-		
 		</div>
 	</div>
 
@@ -201,30 +194,31 @@
 					</div>
 				</button>
 			{/if}
-			
-			<button class="{buttonClass} relative" on:click={goToCart}>
-				<div class="text-white">
-					<svg
-						fill="currentColor"
-						height="20px"
-						viewBox="0 0 256 256"
-						width="20px"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z"
-						/>
-					</svg>
-				</div>
-				
-			</button>
-			{#if cartCount > 0}
+
+			<div class="relative">
+				{#if cartCount > 0}
 					<span
 						class="absolute -top-1 -right-1 bg-[#1f68f9] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
 					>
 						{cartCount}
 					</span>
 				{/if}
+				<button class={buttonClass} on:click={goToCart}>
+					<div class="text-white">
+						<svg
+							fill="currentColor"
+							height="20px"
+							viewBox="0 0 256 256"
+							width="20px"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z"
+							/>
+						</svg>
+					</div>
+				</button>
+			</div>
 		</div>
 
 		<!-- Desktop Action Buttons -->

@@ -401,13 +401,16 @@
 											</td>
 											<td class="px-6 py-4 text-right">
 												<a 
-													class="font-medium text-primary hover:underline bg-transparent border-none p-0 cursor-pointer" 
+													class="hidden font-medium text-primary hover:underline bg-transparent border-none p-0 cursor-pointer" 
 													href="/sales/{order.id}/details"
 													target="_blank"
 													rel="noopener noreferrer"
 												>
 													View Details
 												</a>
+												<button on:click={() => goto(`/sales/${order.id}/details`)} class="font-medium text-primary hover:underline bg-transparent border-none p-0 cursor-pointer">
+													View Details 
+												</button>
 											</td>
 										</tr>
 									{:else}
