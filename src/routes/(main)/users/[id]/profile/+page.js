@@ -1,25 +1,57 @@
 import { api_get } from '$lib/index.js';
-import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
-
+import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT, PHX_COOKIE } from '$lib/constants';
+import Cookies from 'js-cookie';
 /** @type {import('./$types').PageLoad} */
 export async function load(event) {
 	const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
 
 
 
-
 	const { parent, params } = event;
 	const layoutData = await parent();
-	const user_id = layoutData.user.id;
+	let  user_id = layoutData.user.id;
+
+
+	if (!user_id) {
+		const cookieToken = Cookies.get(PHX_COOKIE);
+		const response = await fetch(
+			`${PHX_HTTP_PROTOCOL + PHX_ENDPOINT}/svt_api/webhook?scope=get_cookie_merchant&cookie=${cookieToken}`,
+			{
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			}
+		);
+
+		if (!response.ok) {
+		} else {
+			const res = await response.json();
+
+			if (res) {
+				
+				user_id = res.user_id;
+
+			} else {
+
+			}
+		}
+
+
+
+	}
+
+
+
 	console.log('layoutData', layoutData);
 	// Fetch user data and orders
 	const [user, eWallet, ordersResponse] = await Promise.all([
 		api_get(url, { scope: 'model_get_by', model: 'User', id: user_id }).catch(() => null),
 
 		api_get(url, { scope: 'model_get_by', model: 'Ewallet', user_id: user_id, wallet_type: 'active_token' }).catch(() => null),
-		api_get(url, { scope: 'datatable', model: 'Sale', 
-			
-			additional_search: JSON.stringify([{ column: 'user_id', value: user_id, prefix: 'a', operator: '' }]) 
+		api_get(url, {
+			scope: 'datatable', model: 'Sale',
+
+			additional_search: JSON.stringify([{ column: 'user_id', value: user_id, prefix: 'a', operator: '' }])
 		}).catch(() => ({ data: [] }))
 	]);
 
