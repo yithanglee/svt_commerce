@@ -105,7 +105,7 @@
 										min="1" 
 										value={item.qty} 
 										on:change={(e) => setQty(item.product_id, Number(e.target.value))} 
-										class="w-20 border  bg-gray-800 text-white rounded px-2 py-1 text-sm focus:outline-0 focus:ring-0 focus:border-blue-600" 
+										class="w-20 border border-gray-700 bg-gray-800 text-white rounded px-2 py-1 text-sm focus:outline-0 focus:ring-0 focus:border-blue-600" 
 									/>
 								</div>
 							</div>
@@ -128,7 +128,7 @@
 							type="text" 
 							bind:value={address}
 							placeholder="Enter your address" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-gray-700 bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
@@ -139,7 +139,7 @@
 							type="text" 
 							bind:value={city}
 							placeholder="Enter your city" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-gray-700 bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
@@ -150,7 +150,7 @@
 							type="text" 
 							bind:value={state}
 							placeholder="Enter your state" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-gray-700 bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 					<label class="flex flex-col min-w-40 flex-1">
@@ -159,7 +159,7 @@
 							type="text" 
 							bind:value={zipCode}
 							placeholder="Enter zip code" 
-							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border  bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
+							class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-gray-700 bg-gray-800 focus:border-blue-600 h-14 placeholder:text-blue-300 p-[15px] text-base font-normal leading-normal"
 						/>
 					</label>
 				</div>
@@ -167,26 +167,26 @@
 				<!-- Shipping Options -->
 				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Options</h3>
 				<div class="flex flex-col gap-3 p-4">
-					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid border-gray-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="shipping" 
 							value="standard" 
 							bind:group={shippingOption}
-							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2 border-gray-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
 							<p class="text-white text-sm font-medium leading-normal">Standard (5-7 business days)</p>
 							<p class="text-blue-300 text-sm font-normal leading-normal">Free</p>
 						</div>
 					</label>
-					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid border-gray-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="shipping" 
 							value="self_pickup" 
 							bind:group={shippingOption}
-							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2 border-gray-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
 							<p class="text-white text-sm font-medium leading-normal">Self Pickup</p>
@@ -198,13 +198,13 @@
 				<!-- Payment Method -->
 				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Payment Method</h3>
 				<div class="flex flex-col gap-3 p-4">
-					<label class="flex items-center gap-4 rounded-lg border border-solid  p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
+					<label class="flex items-center gap-4 rounded-lg border border-solid border-gray-700 p-[15px] cursor-pointer hover:border-blue-600 transition-colors">
 						<input 
 							type="radio" 
 							name="payment" 
 							value="member_points" 
 							bind:group={paymentMethod}
-							class="h-5 w-5 border-2  bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
+							class="h-5 w-5 border-2 border-gray-700 bg-transparent text-transparent checked:border-blue-600 checked:bg-[image:--radio-dot-svg] focus:outline-none focus:ring-0 focus:ring-offset-0 checked:focus:border-blue-600"
 						/>
 						<div class="flex grow flex-col">
 							<p class="text-white text-sm font-medium leading-normal">Member Points Balance</p>
