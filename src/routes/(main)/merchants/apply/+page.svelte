@@ -199,7 +199,7 @@
 				
 				<main class="flex flex-col gap-8 py-10">
 					<div class="flex flex-wrap justify-between gap-3 p-4">
-						<p class="text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Become a Merchant</p>
+						<p class="text-4xl font-black text-white leading-tight tracking-[-0.033em] min-w-72">Become a Merchant</p>
 					</div>
                     {#if merchant && merchant.is_approved == false }
                    
@@ -218,10 +218,10 @@
                                 <input type="hidden" name={module}[id] value={0} />
                             {/if}
                             <section>
-								<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Company Information</h2>
+								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Company Information</h2>
 								<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Name <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Name <span class="text-red-500">*</span></p>
 										<input
 											name={module}[name]
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.name ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -234,7 +234,7 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Company Email <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Company Email <span class="text-red-500">*</span></p>
 										<input
 											name="Merchant[company_email]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_email ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -247,7 +247,7 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Company Phone</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Company Phone</p>
 										<input
 											name="Merchant[company_phone]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -257,7 +257,7 @@
 										/>
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Company Registration Number <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Company Registration Number <span class="text-red-500">*</span></p>
 										<input
 											name="Merchant[company_reg_no]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_reg_no ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -269,7 +269,7 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base font-medium leading-normal pb-2">Company Address <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Company Address <span class="text-red-500">*</span></p>
 										<textarea
 											name="Merchant[company_address]"
 											class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_address ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[100px] p-[15px] text-base font-normal leading-normal"
@@ -281,7 +281,7 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base font-medium leading-normal pb-2">Description <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Description <span class="text-red-500">*</span></p>
 										<textarea
 											name="Merchant[description]"
 											class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.description ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
@@ -297,10 +297,10 @@
 							</section>
 							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
 							<section>
-								<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Banking Information</h2>
+								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Banking Information</h2>
 								<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Bank Name</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Bank Name</p>
 										<input
 											name="Merchant[bank_name]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -309,7 +309,7 @@
 										/>
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base font-medium leading-normal pb-2">Account Number</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Account Number</p>
 										<input
 											name="Merchant[bank_account_no]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -318,7 +318,7 @@
 										/>
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base font-medium leading-normal pb-2">Account Holder Name</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">Account Holder Name</p>
 										<input
 											name="Merchant[bank_account_holder]"
 											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -330,22 +330,22 @@
 							</section>
 							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
 							<section>
-								<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Logo Upload</h2>
+								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Logo Upload</h2>
 								<div class="p-4">
 									<label
 										class="flex flex-col items-center justify-center w-full h-64 border-2 {errors.img_url ? 'border-red-500' : 'border-blue-700'} border-dashed rounded-lg cursor-pointer bg-black/20 dark:bg-gray-800 hover:bg-black/30 dark:hover:bg-blue-800/60 transition-colors"
 										for="logo-upload"
 									>
 										<div class="flex flex-col items-center justify-center pt-5 pb-6">
-											<span class="material-symbols-outlined text-4xl mb-4">cloud_upload</span>
+											<span class="material-symbols-outlined text-4xl mb-4 text-white	">cloud_upload</span>
 											{#if uploadedLogoFileName}
-												<p class="mb-2 text-sm font-semibold">{uploadedLogoFileName}</p>
+												<p class="mb-2 text-sm font-semibold text-white">{uploadedLogoFileName}</p>
 											{:else}
-												<p class="mb-2 text-sm">
-													<span class="font-semibold">Click to upload</span> or drag and drop
+												<p class="mb-2 text-sm text-white">
+													<span class="font-semibold ">Click to upload</span> or drag and drop
 												</p>
 											{/if}
-											<p class="text-xs">JPG or PNG (MAX. 5MB)</p>
+											<p class="text-xs text-white">JPG or PNG (MAX. 5MB)</p>
 										</div>
 										<input
 											name="Merchant[img_url]"
@@ -359,28 +359,28 @@
 									{#if errors.img_url}
 										<p class="mt-2 text-sm text-red-500">{errors.img_url}</p>
 									{:else}
-										<p class="mt-2 text-sm">Please upload your company logo.</p>
+										<p class="mt-2 text-sm text-white">Please upload your company logo.</p>
 									{/if}
 								</div>
 							</section>
 							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
 							<section>
-								<h2 class="text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">SSM Document Upload</h2>
+								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">SSM Document Upload</h2>
 								<div class="p-4">
 									<label
 										class="flex flex-col items-center justify-center w-full h-64 border-2 {errors.company_ssm_image_url ? 'border-red-500' : 'border-blue-700'} border-dashed rounded-lg cursor-pointer bg-black/20 dark:bg-gray-800 hover:bg-black/30 dark:hover:bg-blue-800/60 transition-colors"
 										for="ssm-upload"
 									>
 										<div class="flex flex-col items-center justify-center pt-5 pb-6">
-											<span class="material-symbols-outlined text-4xl mb-4">cloud_upload</span>
+											<span class="material-symbols-outlined text-4xl mb-4 text-white">cloud_upload</span>
 											{#if uploadedSSMFileName}
 												<p class="mb-2 text-sm font-semibold">{uploadedSSMFileName}</p>
 											{:else}
-												<p class="mb-2 text-sm">
+												<p class="mb-2 text-sm text-white">
 													<span class="font-semibold">Click to upload</span> or drag and drop
 												</p>
 											{/if}
-											<p class="text-xs">JPG or PNG (MAX. 5MB)</p>
+											<p class="text-xs text-white">JPG or PNG (MAX. 5MB)</p>
 										</div>
 										<input
 											name="Merchant[company_ssm_image_url]"
@@ -394,7 +394,7 @@
 									{#if errors.company_ssm_image_url}
 										<p class="mt-2 text-sm text-red-500">{errors.company_ssm_image_url}</p>
 									{:else}
-										<p class="mt-2 text-sm">Please upload a copy of your SSM document for verification.</p>
+										<p class="mt-2 text-sm text-white">Please upload a copy of your SSM document for verification.</p>
 									{/if}
 								</div>
 							</section>
@@ -410,7 +410,7 @@
 											bind:checked={formData.termsAccepted}
 										/>
 									</div>
-									<div class="ml-3 text-sm">
+									<div class="ml-3 text-sm text-white	">
 										<label class="font-light" for="terms">
 											I accept the
 											<button type="button" class="font-medium hover:underline bg-transparent border-none cursor-pointer p-0">Terms and Conditions</button>
@@ -420,7 +420,7 @@
 								{#if errors.termsAccepted}
 									<p class="text-red-500 text-sm">{errors.termsAccepted}</p>
 								{/if}
-								<div class="flex gap-4">
+								<div class="flex gap-4 text-white">
 									<button
 										class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-transparent border border-blue-700 hover:bg-blue-800 text-base font-bold leading-normal tracking-[0.015em] transition-colors"
 										type="button"
