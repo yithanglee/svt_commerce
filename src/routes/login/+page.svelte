@@ -28,8 +28,12 @@
 		console.log(res);
 	
 		if (res.status == 'ok') {
-			// Set user session/token/cookie
-			await Cookies.set(PHX_COOKIE, res.res , { sameSite: 'Lax' });
+			// Set user session/token/cookie with proper path to ensure it's available across all routes
+			const cookieValue = typeof res.res === 'string' ? res.res : JSON.stringify(res.res);
+			await Cookies.set(PHX_COOKIE, cookieValue, { 
+				sameSite: 'Lax',
+				path: '/'
+			});
 
 			// Redirect to merchant profile
 			console.log('login user');
@@ -45,14 +49,12 @@
 			} catch (e) {
 				console.error('FCM permission/token error:', e);
 			}
-			let cookieToken = await Cookies.get(PHX_COOKIE);
-			console.log("check cookite js")
-			console.log(cookieToken);
-			// Redirect to merchant profile page if merchant_id is available
+			// Redirect to merchant profile page if user id is available
+			// Use window.location.href for full page reload to ensure cookie is sent with request
 			if (res.id) {
-				goto(`/users/${res.id}/profile`);
+				window.location.href = `/users/${res.id}/profile`;
 			} else {
-				goto('/');
+				window.location.href = '/';
 			}
 		} else if (res.status == 'error') {
 			session.logout();
