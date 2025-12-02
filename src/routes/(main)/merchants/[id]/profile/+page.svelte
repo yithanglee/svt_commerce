@@ -1,16 +1,17 @@
 <script>
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll, invalidate } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { Modal, Button, Label, Input, Textarea, Select } from 'flowbite-svelte';
 	import { session } from '$lib/stores/session';
 	import { PHX_COOKIE, PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
-	import { postData } from '$lib/index.js';
+	import { postData, api_get } from '$lib/index.js';
 	import Cookies from 'js-cookie';
 	/** @type {import('./$types').PageData} */
 	export let data;
 	const merchant = data.merchant || {};
-	const products = data.products || [];
+	let products = data.products || [];
 	const categories = data.categories || [];
-	const stats = data.stats || { activeListings: 0, pendingOrders: 0, totalSales: 0, earnings: '0.00' };
+	let stats = data.stats || { activeListings: 0, pendingOrders: 0, totalSales: 0, earnings: '0.00' };
 	
 	let activeTab = 'dashboard';
 	let searchQuery = '';
@@ -18,9 +19,12 @@
 	let showProductModal = false;
 	let isEditMode = false;
 	let isSubmitting = false;
+	let isLoadingProducts = false;
 	let errors = {};
 	let module = 'MerchantProduct';
 	let selectedProduct = null;
+	const merchant_id = data.merchant_id;
+	let isInitialLoad = true;
 	
 	// Form state
 	let formData = {
@@ -46,14 +50,85 @@
 		img_url4: ''
 	};
 	
-	$: filteredProducts = products.filter(product => {
-		const matchesSearch = !searchQuery || 
-			(product.name || '').toLowerCase().includes(searchQuery.toLowerCase());
-		const matchesStatus = statusFilter === 'All' || 
-			(statusFilter === 'Active' && (product.is_active !== false)) ||
-			(statusFilter === 'Inactive' && (product.is_active === false));
-		return matchesSearch && matchesStatus;
+	// Fetch products from API with search and filter
+	async function fetchProducts() {
+		isLoadingProducts = true;
+		try {
+			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+			const searchConditions = [
+				{ column: 'merchant_id', value: merchant_id, prefix: 'a', operator: '' }
+			];
+			
+			// Add search query condition if provided
+			if (searchQuery && searchQuery.trim()) {
+				searchConditions.push({
+					column: 'name',
+					value: searchQuery.trim(),
+					prefix: 'a',
+					operator: 'ilike'
+				});
+			}
+			
+			// Add status filter condition if not 'All'
+			if (statusFilter !== 'All') {
+				const isActiveValue = statusFilter === 'Active' ? true : false;
+				searchConditions.push({
+					column: 'is_active',
+					value: isActiveValue,
+					prefix: 'a',
+					operator: ''
+				});
+			}
+			
+			const allProducts = await api_get(url, {
+				scope: 'datatable',
+				model: 'MerchantProduct',
+				limit: 100,
+				additional_search: JSON.stringify(searchConditions)
+			});
+			
+			products = Array.isArray(allProducts?.data) ? allProducts.data : [];
+			
+			// Recalculate stats
+			const activeListings = products.filter(p => p.is_active !== false).length;
+			const totalSales = products.length;
+			const pendingOrders = 0;
+			const earnings = products.reduce((sum, p) => sum + (parseFloat(p.retail_price) || 0), 0);
+			
+			stats = {
+				activeListings,
+				pendingOrders,
+				totalSales,
+				earnings: earnings.toFixed(2)
+			};
+		} catch (error) {
+			console.error('Error fetching products:', error);
+		} finally {
+			isLoadingProducts = false;
+		}
+	}
+	
+	// Debounce search query to avoid too many API calls
+	let searchTimeout;
+	$: if (activeTab === 'listings' && !isInitialLoad) {
+		clearTimeout(searchTimeout);
+		searchTimeout = setTimeout(() => {
+			fetchProducts();
+		}, 300);
+	}
+	
+	// Watch status filter changes
+	$: if (activeTab === 'listings' && statusFilter && !isInitialLoad) {
+		fetchProducts();
+	}
+	
+	// Mark initial load as complete after component mounts
+	onMount(() => {
+		isInitialLoad = false;
 	});
+	
+	// Use products directly (no client-side filtering needed since API handles it)
+	$: filteredProducts = products;
 	
 	function formatDate(dateString) {
 		if (!dateString) return '-';
@@ -90,6 +165,10 @@
 	
 	function setActiveTab(tab) {
 		activeTab = tab;
+		// When switching to listings tab, fetch products if search/filter is active
+		if (tab === 'listings' && (searchQuery || statusFilter !== 'All')) {
+			fetchProducts();
+		}
 	}
 	
 	function openAddProductModal() {
@@ -235,7 +314,10 @@
 					showProductModal = false;
 					isEditMode = false;
 					selectedProduct = null;
-					await invalidateAll();
+					// Invalidate the page data to refetch products
+					await invalidate('/merchants/' + merchant_id + '/profile');
+					// Also refetch products directly
+					await fetchProducts();
 				}
 			});
 		} catch (error) {
@@ -400,7 +482,7 @@
 										<th class="table-column-120 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Item</th>
 										<th class="table-column-240 px-4 py-3 text-left text-white w-60 text-sm font-medium leading-normal">Status</th>
 										<th class="table-column-360 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Price</th>
-										<th class="table-column-480 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Date Listed</th>
+										<th class="table-column-480 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Image Preview</th>
 										<th class="table-column-600 px-4 py-3 text-left text-white w-60 text-[#90adcb] text-sm font-medium leading-normal">
 											Actions
 										</th>
@@ -422,8 +504,18 @@
 											<td class="table-column-360 h-[72px] px-4 py-2 w-[400px] text-[#90adcb] text-sm font-normal leading-normal">
 												{formatPrice(product.retail_price)}
 											</td>
-											<td class="table-column-480 h-[72px] px-4 py-2 w-[400px] text-[#90adcb] text-sm font-normal leading-normal">
-												{formatDate(product.created_at || product.date_listed)}
+											<td class="table-column-480 h-[72px] px-4 py-2 w-[400px]">
+												{#if product.img_url}
+													<img 
+														src="{product.img_url.startsWith('http') ? product.img_url : PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url}" 
+														alt="{product.name || 'Product image'}"
+														class="w-16 h-16 object-cover rounded-lg border border-[#314d68]"
+													/>
+												{:else}
+													<div class="w-16 h-16 bg-gray-700 rounded-lg border border-[#314d68] flex items-center justify-center">
+														<span class="text-gray-500 text-xs">No image</span>
+													</div>
+												{/if}
 											</td>
 											<td class="table-column-600 h-[72px] px-4 py-2 w-60 text-[#90adcb] text-sm font-bold leading-normal tracking-[0.015em] cursor-pointer"
 												on:click={() => goto(`/products/${product.id}`)}
@@ -463,18 +555,43 @@
 						<p class="text-[#90adcb] text-sm font-normal leading-normal">View and manage all your active and inactive product listings.</p>
 					</div>
 					<div class="flex flex-wrap items-center justify-between gap-4 p-4">
-						<div class="relative w-full sm:w-80">
-							<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-								<svg class="h-5 w-5 text-gray-400" fill="currentColor" height="1em" viewBox="0 0 20 20" width="1em" xmlns="http://www.w3.org/2000/svg">
-									<path clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill-rule="evenodd"></path>
-								</svg>
+						<div class="flex items-center gap-2 w-full sm:w-auto">
+							<div class="relative w-full sm:w-80">
+								<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+									{#if isLoadingProducts}
+										<svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+											<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+										</svg>
+									{:else}
+										<svg class="h-5 w-5 text-gray-400" fill="currentColor" height="1em" viewBox="0 0 20 20" width="1em" xmlns="http://www.w3.org/2000/svg">
+											<path clip-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" fill-rule="evenodd"></path>
+										</svg>
+									{/if}
+								</div>
+								<input 
+									class="block w-full rounded-lg border border-[#314d68] bg-[#182634] p-2 pl-10 pr-10 text-sm text-white placeholder-gray-400 focus:border-[#0d80f2] focus:ring-[#0d80f2]" 
+									placeholder="Search by item name..." 
+									type="text"
+									bind:value={searchQuery}
+									disabled={isLoadingProducts}
+									on:keydown={(e) => {
+										if (e.key === 'Enter') {
+											fetchProducts();
+										}
+									}}
+								/>
 							</div>
-							<input 
-								class="block w-full rounded-lg border border-[#314d68] bg-[#182634] p-2 pl-10 text-sm text-white placeholder-gray-400 focus:border-[#0d80f2] focus:ring-[#0d80f2]" 
-								placeholder="Search by item name..." 
-								type="text"
-								bind:value={searchQuery}
-							/>
+							<button 
+								class="flex items-center justify-center gap-2 rounded-lg bg-[#0d80f2] px-4 py-2 h-[42px] text-sm font-bold text-white transition-colors hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+								on:click={fetchProducts}
+								disabled={isLoadingProducts}
+							>
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+								</svg>
+								<span>Search</span>
+							</button>
 						</div>
 						<div class="flex items-center gap-4">
 							<div class="flex items-center gap-2">
@@ -483,6 +600,7 @@
 									class="rounded-lg border border-[#314d68] bg-[#182634] pr-8 text-sm text-white focus:border-[#0d80f2] focus:ring-[#0d80f2]" 
 									id="status-filter"
 									bind:value={statusFilter}
+									disabled={isLoadingProducts}
 								>
 									<option selected="">All</option>
 									<option>Active</option>
@@ -505,7 +623,7 @@
 										<th class="table-listings-column-120 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white w-[40%]">Item Name</th>
 										<th class="table-listings-column-240 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white">Status</th>
 										<th class="table-listings-column-360 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white">Price</th>
-										<th class="table-listings-column-480 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white">Date Listed</th>
+										<th class="table-listings-column-480 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white">Image Preview</th>
 										<th class="table-listings-column-600 whitespace-nowrap px-4 py-3 text-left text-sm font-medium text-white">Actions</th>
 									</tr>
 								</thead>
@@ -525,11 +643,27 @@
 											<td class="table-listings-column-360 px-4 py-3 text-sm font-normal leading-normal text-[#90adcb]">
 												{formatPrice(product.retail_price)}
 											</td>
-											<td class="table-listings-column-480 px-4 py-3 text-sm font-normal leading-normal text-[#90adcb]">
-												{formatDate(product.created_at || product.date_listed)}
+											<td class="table-listings-column-480 px-4 py-3">
+												{#if product.img_url}
+													<img 
+														src="{product.img_url.startsWith('http') ? product.img_url : PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url}" 
+														alt="{product.name || 'Product image'}"
+														class="w-16 h-16 object-cover rounded-lg border border-[#314d68]"
+													/>
+												{:else}
+													<div class="w-16 h-16 bg-gray-700 rounded-lg border border-[#314d68] flex items-center justify-center">
+														<span class="text-gray-500 text-xs">No image</span>
+													</div>
+												{/if}
 											</td>
 											<td class="table-listings-column-600 px-4 py-3 text-sm font-medium leading-normal">
 												<div class="flex items-center gap-4">
+													<button 
+														class="text-[#0d80f2] hover:underline cursor-pointer bg-transparent border-none p-0"
+														on:click={() => window.open(`/products/${product.id}`, '_blank')}
+													>
+														View
+													</button>
 													<button 
 														class="text-[#0d80f2] hover:underline cursor-pointer bg-transparent border-none p-0"
 														on:click={() => openEditProductModal(product)}

@@ -224,7 +224,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Name <span class="text-red-500">*</span></p>
 										<input
 											name={module}[name]
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.name ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.name ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Company Name"
 											bind:value={formData.name}
 											type="text"
@@ -237,7 +237,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Company Email <span class="text-red-500">*</span></p>
 										<input
 											name="Merchant[company_email]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_email ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_email ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="company@example.com"
 											type="email"
 											bind:value={formData.company_email}
@@ -250,7 +250,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Company Phone</p>
 										<input
 											name="Merchant[company_phone]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="+1 (555) 000-0000"
 											type="tel"
 											bind:value={formData.company_phone}
@@ -260,7 +260,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Company Registration Number <span class="text-red-500">*</span></p>
 										<input
 											name="Merchant[company_reg_no]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_reg_no ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_reg_no ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Registration Number"
 											bind:value={formData.company_reg_no}
 										/>
@@ -272,7 +272,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Company Address <span class="text-red-500">*</span></p>
 										<textarea
 											name="Merchant[company_address]"
-											class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_address ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[100px] p-[15px] text-base font-normal leading-normal"
+											class="form-textarea text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_address ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[100px] p-[15px] text-base font-normal leading-normal"
 											placeholder="Enter company address"
 											bind:value={formData.company_address}
 										></textarea>
@@ -284,7 +284,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Description <span class="text-red-500">*</span></p>
 										<textarea
 											name="Merchant[description]"
-											class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.description ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
+											class="form-textarea  text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.description ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
 											placeholder="Describe your business..."
 											bind:value={formData.description}
 										></textarea>
@@ -303,7 +303,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Bank Name</p>
 										<input
 											name="Merchant[bank_name]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Bank Name"
 											bind:value={formData.bank_name}
 										/>
@@ -312,7 +312,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Account Number</p>
 										<input
 											name="Merchant[bank_account_no]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Account Number"
 											bind:value={formData.bank_account_no}
 										/>
@@ -321,7 +321,7 @@
 										<p class="text-base text-white font-medium leading-normal pb-2">Account Holder Name</p>
 										<input
 											name="Merchant[bank_account_holder]"
-											class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Account Holder Name"
 											bind:value={formData.bank_account_holder}
 										/>
