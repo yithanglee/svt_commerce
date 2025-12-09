@@ -1,8 +1,10 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { session } from '$lib/stores/session';
 	import Cookies from 'js-cookie';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT, PHX_COOKIE } from '$lib/constants';
+	import { onMount } from 'svelte';
 	
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -15,6 +17,15 @@
 	
 	let activeTab = 'profile';
 	let ordersSubTab = 'active';
+	
+	// Check for tab query parameter on mount
+	onMount(() => {
+		const tabParam = $page.url.searchParams.get('tab');
+		if (tabParam === 'orders') {
+			activeTab = 'orders';
+			ordersSubTab = 'active';
+		}
+	});
 	
 	function logout() {
 		session.logout();
@@ -42,6 +53,21 @@
 	
 	function parseOrderDetails(order) {
 		try {
+			// First try to use sales_items array (new format)
+			if (order.sales_items && Array.isArray(order.sales_items) && order.sales_items.length > 0) {
+				const firstItem = order.sales_items[0];
+				const totalQty = order.sales_items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0);
+				return {
+					product_image: firstItem.img_url || '',
+					product_name: firstItem.item_name || 'Product',
+					product_price: firstItem.item_price || '0',
+					quantity: totalQty || '1',
+					total_items: order.sales_items.length,
+					all_items: order.sales_items // Store all items for detailed display
+				};
+			}
+			
+			// Fallback to registration_details (old format)
 			if (order.registration_details) {
 				const details = typeof order.registration_details === 'string' 
 					? JSON.parse(order.registration_details) 
@@ -304,51 +330,81 @@
 									</summary>
 									<div class="border-t border-slate-700 mt-4 pt-4">
 										<h3 class="text-lg font-semibold text-white mb-4">Tracking Details</h3>
-										<div class="flex gap-8">
-											{#if orderDetails.product_image}
-												<img 
-													class="w-24 h-24 object-cover rounded-lg" 
-													src={PHX_HTTP_PROTOCOL + PHX_ENDPOINT + orderDetails.product_image} 
-													alt={orderDetails.product_name}
-												/>
-											{:else}
-												<div class="w-24 h-24 bg-slate-700 rounded-lg flex items-center justify-center">
-													<span class="material-symbols-outlined text-slate-500">image</span>
-												</div>
-											{/if}
-											<div class="flex-1">
-												<p class="text-white font-medium">{orderDetails.product_name}</p>
-												<p class="text-slate-400 text-sm mt-1">
-													Quantity: {orderDetails.quantity} × {formatPrice(orderDetails.product_price)}
-												</p>
-												{#if order.shipping_ref}
-													<p class="text-slate-400 text-sm mt-1">
-														Shipping Ref: <span class="text-primary">{order.shipping_ref}</span>
-													</p>
-												{/if}
-												<p class="text-slate-400 text-sm mt-1">
-													Total: <span class="text-white font-semibold">{formatPrice(order.grand_total || order.subtotal)}</span>
-												</p>
-												<!-- Progress Stepper -->
-												<ol class="items-center w-full space-y-4 sm:flex sm:space-x-8 sm:space-y-0 rtl:space-x-reverse mt-5">
-													{#each trackingSteps as step, index}
-														<li class="flex items-center {step.completed ? 'text-primary' : 'text-slate-500'} space-x-2.5 rtl:space-x-reverse">
-															<span class="flex items-center justify-center w-8 h-8 border {step.completed ? 'border-primary bg-primary/20' : 'border-slate-600'} rounded-full shrink-0">
-																{#if step.completed}
-																	<span class="material-symbols-outlined !text-base">check</span>
-																{:else}
-																	<span class="text-sm">{step.id}</span>
-																{/if}
-															</span>
-															<div>
-																<h3 class="font-medium leading-tight {step.completed ? 'text-white' : ''}">{step.label}</h3>
-																<p class="text-xs {step.completed ? 'text-slate-400' : 'text-slate-500'}">{step.date}</p>
+										{#if orderDetails.all_items && orderDetails.all_items.length > 1}
+											<!-- Multiple items display -->
+											<div class="space-y-3 mb-4">
+												{#each orderDetails.all_items as item}
+													<div class="flex gap-4 items-center p-3 bg-[#101922] rounded-lg">
+														{#if item.img_url}
+															<img 
+																class="w-16 h-16 object-cover rounded-lg" 
+																src={PHX_HTTP_PROTOCOL + PHX_ENDPOINT + item.img_url} 
+																alt={item.item_name || 'Product'}
+															/>
+														{:else}
+															<div class="w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center">
+																<span class="material-symbols-outlined text-slate-500 text-sm">image</span>
 															</div>
-														</li>
-													{/each}
-												</ol>
+														{/if}
+														<div class="flex-1">
+															<p class="text-white font-medium">{item.item_name || 'Product'}</p>
+															<p class="text-slate-400 text-sm">
+																Qty: {item.qty || 1} × {formatPrice(item.item_price || 0)}
+															</p>
+														</div>
+													</div>
+												{/each}
 											</div>
+										{:else}
+											<!-- Single item display -->
+											<div class="flex gap-8">
+												{#if orderDetails.product_image}
+													<img 
+														class="w-24 h-24 object-cover rounded-lg" 
+														src={PHX_HTTP_PROTOCOL + PHX_ENDPOINT + orderDetails.product_image} 
+														alt={orderDetails.product_name}
+													/>
+												{:else}
+													<div class="w-24 h-24 bg-slate-700 rounded-lg flex items-center justify-center">
+														<span class="material-symbols-outlined text-slate-500">image</span>
+													</div>
+												{/if}
+												<div class="flex-1">
+													<p class="text-white font-medium">{orderDetails.product_name}</p>
+													<p class="text-slate-400 text-sm mt-1">
+														Quantity: {orderDetails.quantity} × {formatPrice(orderDetails.product_price)}
+													</p>
+												</div>
+											</div>
+										{/if}
+										<div class="mt-4">
+											{#if order.shipping_ref}
+												<p class="text-slate-400 text-sm mt-1">
+													Shipping Ref: <span class="text-primary">{order.shipping_ref}</span>
+												</p>
+											{/if}
+											<p class="text-slate-400 text-sm mt-1">
+												Total: <span class="text-white font-semibold">{formatPrice(order.grand_total || order.subtotal)}</span>
+											</p>
 										</div>
+										<!-- Progress Stepper -->
+										<ol class="items-center w-full space-y-4 sm:flex sm:space-x-8 sm:space-y-0 rtl:space-x-reverse mt-5">
+											{#each trackingSteps as step, index}
+												<li class="flex items-center {step.completed ? 'text-primary' : 'text-slate-500'} space-x-2.5 rtl:space-x-reverse">
+													<span class="flex items-center justify-center w-8 h-8 border {step.completed ? 'border-primary bg-primary/20' : 'border-slate-600'} rounded-full shrink-0">
+														{#if step.completed}
+															<span class="material-symbols-outlined !text-base">check</span>
+														{:else}
+															<span class="text-sm">{step.id}</span>
+														{/if}
+													</span>
+													<div>
+														<h3 class="font-medium leading-tight {step.completed ? 'text-white' : ''}">{step.label}</h3>
+														<p class="text-xs {step.completed ? 'text-slate-400' : 'text-slate-500'}">{step.date}</p>
+													</div>
+												</li>
+											{/each}
+										</ol>
 									</div>
 								</details>
 							{:else}

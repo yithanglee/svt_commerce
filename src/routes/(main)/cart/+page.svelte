@@ -3,6 +3,7 @@
 	import { postData, api_get } from '$lib/index.js';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
 	import { session } from '$lib/stores/session';
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	
 	/** @type {import('./$types').PageData} */
@@ -11,12 +12,39 @@
 	let isSubmitting = false;
 	let shippingOption = 'standard';
 	let paymentMethod = 'member_points';
+	let userSaleAddresses = Array.isArray(data?.userSaleAddresses) 
+		? data.userSaleAddresses 
+		: (data?.userSaleAddresses?.data || []); 
+	console.log('userSaleAddresses', userSaleAddresses);
 	
 	// Shipping information
+	let selectedAddressId = '';
 	let address = '';
 	let city = '';
 	let state = '';
 	let zipCode = '';
+	
+	function selectAddress(addressId) {
+		if (addressId === '' || addressId === 'new') {
+			selectedAddressId = addressId;
+			address = '';
+			city = '';
+			state = '';
+			zipCode = '';
+			return;
+		}
+		const selectedAddress = userSaleAddresses.find(addr => addr.id == addressId);
+		if (selectedAddress) {
+			selectedAddressId = addressId;
+			address = selectedAddress.line1 || '';
+			if (selectedAddress.line2) {
+				address += (address ? ', ' : '') + selectedAddress.line2;
+			}
+			city = selectedAddress.city || '';
+			state = selectedAddress.state || '';
+			zipCode = selectedAddress.postcode || '';
+		}
+	}
 	
 	// Member points
 	let memberPointsBalance = data?.eWallet?.total || 0;
@@ -48,6 +76,7 @@
 		const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
 		const payload = { 
 			scope: 'ecommerce_checkout', 
+			user_id: $session.user?.id,
 			items,
 			shippingOption,
 			paymentMethod,
@@ -62,6 +91,11 @@
 		isSubmitting = false;
 		if (res && res.status === 'ok') {
 			clearCart();
+			// Redirect to user profile with orders tab focused
+			const userId = $session.user?.id;
+			if (userId) {
+				goto(`/users/${userId}/profile?tab=orders`);
+			}
 		}
 	}
 </script>
@@ -108,6 +142,9 @@
 										class="w-20 border border-gray-700 bg-gray-800 text-white rounded px-2 py-1 text-sm focus:outline-0 focus:ring-0 focus:border-blue-600" 
 									/>
 								</div>
+								<p class="text-white text-sm font-medium leading-normal mt-1">
+									Subtotal: ${((Number(item.price || 0) * Number(item.qty || 0)).toFixed(2))}
+								</p>
 							</div>
 							<button 
 								class="text-blue-300 text-sm font-normal leading-normal hover:text-white transition-colors self-center" 
@@ -121,6 +158,25 @@
 				
 				<!-- Shipping Information -->
 				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Shipping Information</h3>
+				{#if userSaleAddresses.length > 0}
+					<div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+						<label class="flex flex-col min-w-40 flex-1">
+							<p class="text-white text-base font-medium leading-normal pb-2">Select Saved Address</p>
+							<select 
+								bind:value={selectedAddressId}
+								on:change={(e) => selectAddress(e.target.value)}
+								class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-gray-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+							>
+								<option value="new">Enter New Address</option>
+								{#each userSaleAddresses as addr}
+									<option value={addr.id}>
+										{addr.fullname || 'Address'} - {addr.line1}{addr.city ? ', ' + addr.city : ''}{addr.state ? ', ' + addr.state : ''}
+									</option>
+								{/each}
+							</select>
+						</label>
+					</div>
+				{/if}
 				<div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
 					<label class="flex flex-col min-w-40 flex-1">
 						<p class="text-white text-base font-medium leading-normal pb-2">Address</p>

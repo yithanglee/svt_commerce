@@ -80,6 +80,7 @@ export async function load(event) {
 		apiGetWithFetch('model_get_by', { model: 'Ewallet', user_id: user_id, wallet_type: 'active_token' }).catch(() => null),
 		apiGetWithFetch('datatable', {
 			model: 'Sale',
+			preloads: JSON.stringify(['sales_items']),
 			additional_search: JSON.stringify([{ column: 'user_id', value: user_id, prefix: 'a', operator: '' }])
 		}).catch(() => ({ data: [] }))
 	]);
@@ -87,7 +88,7 @@ export async function load(event) {
 	// Extract orders from response (response has { data: [...], draw, recordsFiltered, recordsTotal })
 	const orders = Array.isArray(ordersResponse?.data) ? ordersResponse.data :
 		Array.isArray(ordersResponse) ? ordersResponse : [];
-
+console.log('orders', orders);
 	// Separate active and completed orders
 	// Active orders: all statuses except delivered, cancelled, or complete
 	const activeOrders = orders.filter(order => {

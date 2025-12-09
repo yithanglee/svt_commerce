@@ -17,10 +17,10 @@ export function addItem(product) {
 		const idx = items.findIndex((i) => i.product_id === product.id);
 		if (idx >= 0) {
 			const copy = [...items];
-			copy[idx] = { ...copy[idx], qty: copy[idx].qty + 1 };
+			copy[idx] = { ...copy[idx], qty: copy[idx].qty + 1, merchant_id: product.merchant_id || copy[idx].merchant_id };
 			return copy;
 		}
-		return [...items, { product_id: product.id, name: product.name, price: product.retail_price, img_url: product.img_url, qty: 1 }];
+		return [...items, { product_id: product.id, name: product.name, price: product.retail_price, img_url: product.img_url, merchant_id: product.merchant_id, qty: 1 }];
 	});
 }
 
