@@ -11,7 +11,7 @@
 	const merchant = data.merchant || {};
 	let products = data.products || [];
 	const categories = data.categories || [];
-	let stats = data.stats || { activeListings: 0, pendingOrders: 0, totalSales: 0, earnings: '0.00' };
+	$: stats = data.stats || { activeListings: 0, pendingOrders: 0, totalSales: 0, earnings: '0.00' };
 	
 	let activeTab = 'dashboard';
 	let searchQuery = '';
@@ -25,6 +25,11 @@
 	let selectedProduct = null;
 	const merchant_id = data.merchant_id;
 	let isInitialLoad = true;
+	$: orders = data.orders || [];
+	$: activeOrders = data.activeOrders || [];
+	$: orderHistory = data.orderHistory || [];
+	let orderStatusFilter = 'All';
+	let isUpdatingStatus = false;
 	
 	// Form state
 	let formData = {
@@ -152,6 +157,98 @@
 		if (!price) return '$0';
 		return `$${parseFloat(price).toFixed(2)}`;
 	}
+	
+	function getStatusBadgeClass(status) {
+		const statusLower = status?.toLowerCase() || '';
+		switch (statusLower) {
+			case 'pending_confirmation':
+			case 'pending_payment':
+				return 'bg-yellow-900 text-yellow-300';
+			case 'processing':
+			case 'preparing':
+				return 'bg-blue-900 text-blue-300';
+			case 'pending_delivery':
+				return 'bg-purple-900 text-purple-300';
+			case 'sent':
+			case 'complete':
+				return 'bg-green-900 text-green-300';
+			case 'cancelled':
+			case 'refund':
+				return 'bg-red-900 text-red-300';
+			default:
+				return 'bg-gray-700 text-gray-300';
+		}
+	}
+	
+	function getStatusDisplayName(status) {
+		const statusLower = status?.toLowerCase() || '';
+		switch (statusLower) {
+			case 'pending_confirmation':
+				return 'Pending Confirmation';
+			case 'pending_payment':
+				return 'Pending Payment';
+			case 'processing':
+				return 'Processing';
+			case 'preparing':
+				return 'Preparing';
+			case 'pending_delivery':
+				return 'Pending Delivery';
+			case 'sent':
+				return 'Sent';
+			case 'complete':
+				return 'Complete';
+			case 'cancelled':
+				return 'Cancelled';
+			case 'refund':
+				return 'Refunded';
+			default:
+				return status || 'Unknown';
+		}
+	}
+	
+	function getNextStatusOptions(currentStatus) {
+		const statusLower = currentStatus?.toLowerCase() || '';
+		switch (statusLower) {
+			case 'processing':
+				return ['pending_delivery'];
+			case 'pending_delivery':
+				return ['sent'];
+			default:
+				return [];
+		}
+	}
+	
+	async function updateOrderStatus(orderId, newStatus) {
+		if (isUpdatingStatus) return;
+		
+		isUpdatingStatus = true;
+		try {
+			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+			await postData(
+				{ scope: 'mark_do', id: orderId, status: newStatus },
+				{
+					endpoint: url + '/svt_api/webhook',
+					successCallback: async () => {
+						// Refresh orders
+						await invalidate('/merchants/' + merchant_id + '/profile');
+						// Reload page data
+						await invalidateAll();
+					}
+				}
+			);
+		} catch (error) {
+			console.error('Error updating order status:', error);
+			alert('Failed to update order status. Please try again.');
+		} finally {
+			isUpdatingStatus = false;
+		}
+	}
+	
+	$: filteredOrders = orderStatusFilter === 'All' 
+		? orders 
+		: orderStatusFilter === 'Active' 
+			? activeOrders 
+			: orderHistory;
 	
 	function getStatus(product) {
 		// Assuming products have a status field, or use is_active
@@ -702,8 +799,101 @@
 							<p class="text-[#90adcb] text-sm font-normal leading-normal">View and manage your orders.</p>
 						</div>
 					</div>
-					<div class="flex items-center justify-center p-8">
-						<p class="text-[#90adcb] text-base">Orders content placeholder</p>
+					
+					<!-- Order Filter -->
+					<div class="flex items-center gap-4 px-4 pb-3">
+						<div class="flex items-center gap-2">
+							<label class="text-sm font-medium text-white" for="order-status-filter">Filter:</label>
+							<select 
+								class="rounded-lg border border-[#314d68] bg-[#182634] pr-8 text-sm text-white focus:border-[#0d80f2] focus:ring-[#0d80f2]" 
+								id="order-status-filter"
+								bind:value={orderStatusFilter}
+							>
+								<option value="All">All Orders</option>
+								<option value="Active">Active Orders</option>
+								<option value="History">Order History</option>
+							</select>
+						</div>
+					</div>
+					
+					<!-- Orders Table -->
+					<div class="px-4 py-3 @container">
+						<div class="flex overflow-hidden rounded-lg border border-[#314d68] bg-[#101a23]">
+							<table class="w-full flex-1">
+								<thead>
+									<tr class="bg-[#182634]">
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Order ID</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Customer</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Items</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Total</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Status</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Date</th>
+										<th class="px-4 py-3 text-left text-sm font-medium text-white">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each filteredOrders as order}
+										<tr class="border-t border-t-[#314d68]">
+											<td class="px-4 py-3 text-sm font-normal text-white">
+												#{order.id}
+											</td>
+											<td class="px-4 py-3 text-sm font-normal text-white">
+												{order.user?.fullname || order.user?.email || order.user?.username || 'N/A'}
+											</td>
+											<td class="px-4 py-3 text-sm font-normal text-[#90adcb]">
+												{#if order.sales_items && order.sales_items.length > 0}
+													{order.sales_items.length} item{order.sales_items.length !== 1 ? 's' : ''}
+												{:else}
+													-
+												{/if}
+											</td>
+											<td class="px-4 py-3 text-sm font-normal text-[#90adcb]">
+												{formatPrice(order.grand_total)}
+											</td>
+											<td class="px-4 py-3 text-sm font-normal">
+												<span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {getStatusBadgeClass(order.status)}">
+													{getStatusDisplayName(order.status)}
+												</span>
+											</td>
+											<td class="px-4 py-3 text-sm font-normal text-[#90adcb]">
+												{formatDate(order.inserted_at)}
+											</td>
+											<td class="px-4 py-3 text-sm font-medium">
+												<div class="flex items-center gap-2">
+													{#if getNextStatusOptions(order.status).length > 0}
+														<select 
+															class="rounded-lg border border-[#314d68] bg-[#182634] text-xs text-white focus:border-[#0d80f2] focus:ring-[#0d80f2]"
+															disabled={isUpdatingStatus}
+															on:change={(e) => {
+																if (e.target.value) {
+																	updateOrderStatus(order.id, e.target.value);
+																	e.target.value = '';
+																}
+															}}
+														>
+															<option value="">Update Status</option>
+															{#each getNextStatusOptions(order.status) as statusOption}
+																<option value={statusOption}>{getStatusDisplayName(statusOption)}</option>
+															{/each}
+														</select>
+													{/if}
+													<button 
+														class="text-[#0d80f2] hover:underline cursor-pointer bg-transparent border-none p-0 text-xs"
+														on:click={() => window.open(`/sales/${order.id}/details`, '_blank')}
+													>
+														View
+													</button>
+												</div>
+											</td>
+										</tr>
+									{:else}
+										<tr>
+											<td colspan="7" class="px-4 py-8 text-center text-[#90adcb] text-sm">No orders found</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
 					</div>
 				{:else if activeTab === 'analytics'}
 					<div class="flex flex-wrap justify-between gap-3 p-4">
