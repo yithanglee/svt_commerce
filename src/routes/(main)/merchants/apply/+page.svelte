@@ -13,7 +13,7 @@
 		{ label: 'Home', href: '/' },
 		{ label: 'Shop', href: '/shop' },
 		{ label: 'Sell', href: '/merchants/apply' },
-		{ label: 'Community', href: '#' }
+		{ label: 'Community', href: '/merchants' }
 	];
 
 	// Check if merchant already exists (non-reactive, just for checking)

@@ -45,9 +45,7 @@
 
 	$: userInitials = user?.username ? getUserInitials(user.username) : '';
 
-	function goToShop() {
-		goto('/shop');
-	}
+
 
 	function goToLogin() {
 		goto('/login');
@@ -56,6 +54,9 @@
 	function goToCart() {
 		goto('/cart');
 	}
+
+
+
 
 	function goToProfile() {
 		if (isLoggedIn && user?.id) {

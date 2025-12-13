@@ -20,34 +20,118 @@
 	let priceRange = { min: 0, max: 500 };
 	let selectedConditions = [];
 	
-	// Filter products based on search, categories, price, and condition
-	$: filteredProducts = products.filter(product => {
-		// Search filter
-		if (searchQuery && !product.name?.toLowerCase().includes(searchQuery.toLowerCase()) && 
-		    !product.desc?.toLowerCase().includes(searchQuery.toLowerCase())) {
-			return false;
+	// Calculate relevance score for search ranking
+	function calculateRelevanceScore(product, query) {
+		if (!query) return 0;
+		
+		const queryLower = query.toLowerCase();
+		const nameLower = (product.name || '').toLowerCase();
+		const descLower = (product.desc || '').toLowerCase();
+		const brandLower = (product.brand_name || '').toLowerCase();
+		
+		let score = 0;
+		
+		// Exact match in name gets highest score
+		if (nameLower === queryLower) {
+			score += 1000;
+		}
+		// Name starts with query gets high score
+		else if (nameLower.startsWith(queryLower)) {
+			score += 500;
+		}
+		// Name contains query gets medium score
+		else if (nameLower.includes(queryLower)) {
+			score += 200;
 		}
 		
-		// Category filter
-		if (selectedCategories.length > 0 && !selectedCategories.includes(product.category_id)) {
-			return false;
+		// Check if all words in query match
+		const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+		const nameWords = nameLower.split(/\s+/);
+		const allWordsMatch = queryWords.every(word => nameWords.some(nw => nw.includes(word)));
+		if (allWordsMatch && nameLower.includes(queryLower)) {
+			score += 300; // Bonus for matching all words
 		}
 		
-		// Price filter
-		const price = parseFloat(product.retail_price) || 0;
-		const minPrice = priceRange.min ?? 0;
-		const maxPrice = priceRange.max ?? maxProductPrice ?? 500;
-		if (price < minPrice || price > maxPrice) {
-			return false;
+		// Brand name match gets bonus
+		if (brandLower.includes(queryLower)) {
+			score += 150;
 		}
 		
-		// Condition filter (assuming product has a condition field)
-		if (selectedConditions.length > 0 && product.condition && !selectedConditions.includes(product.condition)) {
-			return false;
+		// Description match gets lower score
+		if (descLower.includes(queryLower)) {
+			score += 50;
 		}
 		
-		return true;
-	});
+		// Partial word matches (if query has multiple words)
+		if (queryWords.length > 1) {
+			const matchedWords = queryWords.filter(word => 
+				nameLower.includes(word) || brandLower.includes(word)
+			).length;
+			score += matchedWords * 100;
+		}
+		
+		return score;
+	}
+	
+	// Filter and sort products based on search, categories, price, and condition
+	$: filteredProducts = (() => {
+		// First filter products
+		let filtered = products.filter(product => {
+			// Search filter
+			if (searchQuery) {
+				const queryLower = searchQuery.toLowerCase();
+				const nameLower = (product.name || '').toLowerCase();
+				const descLower = (product.desc || '').toLowerCase();
+				const brandLower = (product.brand_name || '').toLowerCase();
+				
+				// Check if product matches search query
+				const matchesSearch = nameLower.includes(queryLower) || 
+				                     descLower.includes(queryLower) ||
+				                     brandLower.includes(queryLower) ||
+				                     // Check if all words in query are found
+				                     queryLower.split(/\s+/).every(word => 
+				                         nameLower.includes(word) || 
+				                         descLower.includes(word) ||
+				                         brandLower.includes(word)
+				                     );
+				
+				if (!matchesSearch) {
+					return false;
+				}
+			}
+			
+			// Category filter
+			if (selectedCategories.length > 0 && !selectedCategories.includes(product.category_id)) {
+				return false;
+			}
+			
+			// Price filter
+			const price = parseFloat(product.retail_price) || 0;
+			const minPrice = priceRange.min ?? 0;
+			const maxPrice = priceRange.max ?? maxProductPrice ?? 500;
+			if (price < minPrice || price > maxPrice) {
+				return false;
+			}
+			
+			// Condition filter (assuming product has a condition field)
+			if (selectedConditions.length > 0 && product.condition && !selectedConditions.includes(product.condition)) {
+				return false;
+			}
+			
+			return true;
+		});
+		
+		// Then sort by relevance if there's a search query
+		if (searchQuery) {
+			filtered = filtered.sort((a, b) => {
+				const scoreA = calculateRelevanceScore(a, searchQuery);
+				const scoreB = calculateRelevanceScore(b, searchQuery);
+				return scoreB - scoreA; // Higher score first
+			});
+		}
+		
+		return filtered;
+	})();
 
 	function handleSearch(e) {
 		searchQuery = e.target.value;
@@ -244,9 +328,7 @@
 			
 			<!-- Main Content -->
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-				<div class="flex flex-wrap justify-between gap-3 p-4">
-					<p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Shop Second-Hand</p>
-				</div>
+				
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
 					{#each filteredProducts as product (product.id)}
 						<button

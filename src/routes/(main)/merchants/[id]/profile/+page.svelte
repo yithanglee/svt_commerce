@@ -155,7 +155,7 @@
 	
 	function formatPrice(price) {
 		if (!price) return '$0';
-		return `$${parseFloat(price).toFixed(2)}`;
+		return `${parseFloat(price).toFixed(2)} ATP`;
 	}
 	
 	function getStatusBadgeClass(status) {
@@ -225,7 +225,7 @@
 		try {
 			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
 			await postData(
-				{ scope: 'mark_do', id: orderId, status: newStatus },
+				{ scope: 'mark_merchant_do', id: orderId, status: newStatus },
 				{
 					endpoint: url + '/svt_api/webhook',
 					successCallback: async () => {
@@ -343,7 +343,7 @@
 			errors[fieldName] = 'File must be JPG or PNG';
 			return false;
 		}
-		return true;
+		return true;formatPrice
 	}
 	
 	function handleImageChange(event, fieldName) {
@@ -565,7 +565,7 @@
 						</div>
 						<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#223649]">
 							<p class="text-white text-base font-medium leading-normal">Earnings</p>
-							<p class="text-white tracking-light text-2xl font-bold leading-tight">${stats.earnings}</p>
+							<p class="text-white tracking-light text-2xl font-bold leading-tight">{stats.earnings} ATP</p>
 						</div>
 					</div>
 					

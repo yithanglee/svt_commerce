@@ -223,9 +223,7 @@
 			
 			<!-- Main Content -->
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-				<div class="flex flex-wrap justify-between gap-3 p-4">
-					<p class="tracking-light text-[32px] font-bold leading-tight min-w-72">Shop Second-Hand</p>
-				</div>
+				
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
 					{#each filteredProducts as product (product.id)}
 						<button

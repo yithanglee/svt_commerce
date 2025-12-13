@@ -12,11 +12,34 @@
 	
 	function parseOrderDetails() {
 		try {
+			// First, try to use sales_items array (most reliable source)
+			if (sale.sales_items && Array.isArray(sale.sales_items) && sale.sales_items.length > 0) {
+				return sale.sales_items.map(item => ({
+					image: item.img_url || '',
+					name: item.item_name || 'Product',
+					price: parseFloat(item.item_price || 0),
+					pv: parseFloat(item.item_pv || 0),
+					quantity: parseInt(item.qty || 1)
+				}));
+			}
+			
+			// Fallback to registration_details.items array (new format)
 			if (sale.registration_details) {
 				const details = typeof sale.registration_details === 'string' 
 					? JSON.parse(sale.registration_details) 
 					: sale.registration_details;
 				
+				if (details.items && Array.isArray(details.items) && details.items.length > 0) {
+					return details.items.map(item => ({
+						image: item.img_url || '',
+						name: item.name || 'Product',
+						price: parseFloat(item.price || 0),
+						pv: parseFloat(item.pv || 0),
+						quantity: parseInt(item.qty || 1)
+					}));
+				}
+				
+				// Fallback to old format: registration_details.user.products
 				if (details.user && details.user.products) {
 					const products = details.user.products;
 					const productKeys = Object.keys(products);
@@ -54,8 +77,8 @@
 	}
 	
 	function formatPrice(price) {
-		if (!price && price !== 0) return '$0.00';
-		return `$${parseFloat(price).toFixed(2)}`;
+		if (!price && price !== 0) return 'RM 0.00';
+		return ` ${parseFloat(price).toFixed(2)} ATP`;
 	}
 	
 	function formatDateTime(dateString) {

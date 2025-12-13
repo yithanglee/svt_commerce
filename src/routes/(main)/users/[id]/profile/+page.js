@@ -81,7 +81,9 @@ export async function load(event) {
 		apiGetWithFetch('datatable', {
 			model: 'Sale',
 			preloads: JSON.stringify(['sales_items']),
-			additional_search: JSON.stringify([{ column: 'user_id', value: user_id, prefix: 'a', operator: '' }])
+			additional_search: JSON.stringify([
+				{ column: 'user_id', value: user_id, prefix: 'a', operator: '' },
+				{ column: 'merchant_id', value: 0, prefix: 'a', operator: '!=' }])
 		}).catch(() => ({ data: [] }))
 	]);
 
