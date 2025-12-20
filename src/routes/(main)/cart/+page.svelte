@@ -143,7 +143,7 @@
 									/>
 								</div>
 								<p class="text-white text-sm font-medium leading-normal mt-1">
-									Subtotal: {((Number(item.price || 0) * Number(item.qty || 0)).toFixed(2))} ATP
+									Subtotal: {((Number(item.price || 0) * Number(item.qty || 0)).toFixed(2))} NST
 								</p>
 							</div>
 							<button 
@@ -289,7 +289,7 @@
 				<div class="p-4">
 					<div class="flex justify-between gap-x-6 py-2">
 						<p class="text-blue-300 text-sm font-normal leading-normal">Subtotal</p>
-						<p class="text-white text-sm font-normal leading-normal text-right">{subtotal.toFixed(2)} ATP</p>
+						<p class="text-white text-sm font-normal leading-normal text-right">{subtotal.toFixed(2)} NST</p>
 					</div>
 					<div class="flex justify-between gap-x-6 py-2">
 						<p class="text-blue-300 text-sm font-normal leading-normal">Shipping</p>
@@ -297,7 +297,7 @@
 					</div>
 					<div class="flex justify-between gap-x-6 py-2">
 						<p class="text-blue-300 text-sm font-normal leading-normal">Total</p>
-						<p class="text-white text-sm font-normal leading-normal text-right">{total.toFixed(2)} ATP</p>
+						<p class="text-white text-sm font-normal leading-normal text-right">{total.toFixed(2)} NST</p>
 					</div>
 				</div>
 				

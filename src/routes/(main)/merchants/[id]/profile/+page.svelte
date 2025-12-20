@@ -154,8 +154,8 @@
 	}
 	
 	function formatPrice(price) {
-		if (!price) return '$0';
-		return `${parseFloat(price).toFixed(2)} ATP`;
+		if (!price) return '0 NST';
+		return `${parseFloat(price).toFixed(2)} NST`;
 	}
 	
 	function getStatusBadgeClass(status) {
@@ -565,7 +565,7 @@
 						</div>
 						<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#223649]">
 							<p class="text-white text-base font-medium leading-normal">Earnings</p>
-							<p class="text-white tracking-light text-2xl font-bold leading-tight">{stats.earnings} ATP</p>
+							<p class="text-white tracking-light text-2xl font-bold leading-tight">{stats.earnings} NST</p>
 						</div>
 					</div>
 					

@@ -77,8 +77,8 @@
 	}
 	
 	function formatPrice(price) {
-		if (!price && price !== 0) return 'RM 0.00';
-		return ` ${parseFloat(price).toFixed(2)} ATP`;
+		if (!price && price !== 0) return '0 NST';
+		return ` ${parseFloat(price).toFixed(2)} NST`;
 	}
 	
 	function formatDateTime(dateString) {

@@ -47,8 +47,8 @@
 	}
 	
 	function formatPrice(price) {
-		if (!price) return '0.00 ATP';
-		return `${parseFloat(price).toFixed(2)} ATP`;
+		if (!price) return '0.00 NST';
+		return `${parseFloat(price).toFixed(2)} NST`;
 	}
 	
 	function parseOrderDetails(order) {

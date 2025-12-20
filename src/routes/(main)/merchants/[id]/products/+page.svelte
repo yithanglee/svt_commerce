@@ -112,7 +112,7 @@
 	
 	function formatPrice(price) {
 		const numPrice = parseFloat(price) || 0;
-		return `$${numPrice.toFixed(2)}`;
+		return `${numPrice.toFixed(2)} NST`;
 	}
 	
 	function goToProduct(productId) {
