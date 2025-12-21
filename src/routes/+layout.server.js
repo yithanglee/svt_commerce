@@ -32,6 +32,7 @@ export const load = async ({ cookies, fetch }) => {
 				user = {
 					country_id: res.user?.country_id,
 					username: res.user?.username,
+					rank_name: res.user?.rank?.name,
 					token: cookieToken,
 					role_app_routes: res.role_app_routes ?? [],
 					id: res.user_id,

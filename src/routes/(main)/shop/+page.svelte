@@ -1,36 +1,36 @@
 <script>
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { addItem } from '$lib/stores/cart';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
 	/** @type {import('./$types').PageData} */
 	export let data;
 
 	let products = data.products || [];
-	let categories = data.categories || [];
+	let merchantProductCategories = data.categories || [];
 	let searchQuery = data.filters?.search || '';
-	let selectedCategories = [];
-	
+	let selectedMerchantProductCategoryIds = [];
+
 	// Calculate max price from products or use default
-	$: maxProductPrice = products.length > 0 
-		? Math.max(...products.map(p => parseFloat(p.retail_price) || 0), 500)
-		: 500;
-	
+	$: maxProductPrice =
+		products.length > 0
+			? Math.max(...products.map((p) => parseFloat(p.retail_price) || 0), 500)
+			: 500;
+
 	// Initialize with default values to prevent undefined
 	let priceRange = { min: 0, max: 500 };
-	let selectedConditions = [];
-	
+	let selectedProductConditions = [];
+
 	// Calculate relevance score for search ranking
 	function calculateRelevanceScore(product, query) {
 		if (!query) return 0;
-		
+
 		const queryLower = query.toLowerCase();
 		const nameLower = (product.name || '').toLowerCase();
 		const descLower = (product.desc || '').toLowerCase();
 		const brandLower = (product.brand_name || '').toLowerCase();
-		
+
 		let score = 0;
-		
+
 		// Exact match in name gets highest score
 		if (nameLower === queryLower) {
 			score += 1000;
@@ -43,68 +43,78 @@
 		else if (nameLower.includes(queryLower)) {
 			score += 200;
 		}
-		
+
 		// Check if all words in query match
-		const queryWords = queryLower.split(/\s+/).filter(w => w.length > 0);
+		const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 0);
 		const nameWords = nameLower.split(/\s+/);
-		const allWordsMatch = queryWords.every(word => nameWords.some(nw => nw.includes(word)));
+		const allWordsMatch = queryWords.every((word) => nameWords.some((nw) => nw.includes(word)));
 		if (allWordsMatch && nameLower.includes(queryLower)) {
 			score += 300; // Bonus for matching all words
 		}
-		
+
 		// Brand name match gets bonus
 		if (brandLower.includes(queryLower)) {
 			score += 150;
 		}
-		
+
 		// Description match gets lower score
 		if (descLower.includes(queryLower)) {
 			score += 50;
 		}
-		
+
 		// Partial word matches (if query has multiple words)
 		if (queryWords.length > 1) {
-			const matchedWords = queryWords.filter(word => 
-				nameLower.includes(word) || brandLower.includes(word)
+			const matchedWords = queryWords.filter(
+				(word) => nameLower.includes(word) || brandLower.includes(word)
 			).length;
 			score += matchedWords * 100;
 		}
-		
+
 		return score;
 	}
-	
-	// Filter and sort products based on search, categories, price, and condition
+
+	// Filter and sort products based on search, merchant product categories, price, and product condition
 	$: filteredProducts = (() => {
 		// First filter products
-		let filtered = products.filter(product => {
+		let filtered = products.filter((product) => {
 			// Search filter
 			if (searchQuery) {
 				const queryLower = searchQuery.toLowerCase();
 				const nameLower = (product.name || '').toLowerCase();
 				const descLower = (product.desc || '').toLowerCase();
 				const brandLower = (product.brand_name || '').toLowerCase();
-				
+
 				// Check if product matches search query
-				const matchesSearch = nameLower.includes(queryLower) || 
-				                     descLower.includes(queryLower) ||
-				                     brandLower.includes(queryLower) ||
-				                     // Check if all words in query are found
-				                     queryLower.split(/\s+/).every(word => 
-				                         nameLower.includes(word) || 
-				                         descLower.includes(word) ||
-				                         brandLower.includes(word)
-				                     );
-				
+				const matchesSearch =
+					nameLower.includes(queryLower) ||
+					descLower.includes(queryLower) ||
+					brandLower.includes(queryLower) ||
+					// Check if all words in query are found
+					queryLower
+						.split(/\s+/)
+						.every(
+							(word) =>
+								nameLower.includes(word) || descLower.includes(word) || brandLower.includes(word)
+						);
+
 				if (!matchesSearch) {
 					return false;
 				}
 			}
-			
-			// Category filter
-			if (selectedCategories.length > 0 && !selectedCategories.includes(product.category_id)) {
+
+			// Merchant product category filter (fallback to legacy category_id if present)
+			const merchantProductCategoryId = product.merchant_product_category_id ?? product.category_id;
+			const merchantProductCategoryIdNum =
+				typeof merchantProductCategoryId === 'string'
+					? parseInt(merchantProductCategoryId, 10)
+					: merchantProductCategoryId;
+			if (
+				selectedMerchantProductCategoryIds.length > 0 &&
+				!selectedMerchantProductCategoryIds.includes(merchantProductCategoryIdNum)
+			) {
 				return false;
 			}
-			
+
 			// Price filter
 			const price = parseFloat(product.retail_price) || 0;
 			const minPrice = priceRange.min ?? 0;
@@ -112,15 +122,19 @@
 			if (price < minPrice || price > maxPrice) {
 				return false;
 			}
-			
-			// Condition filter (assuming product has a condition field)
-			if (selectedConditions.length > 0 && product.condition && !selectedConditions.includes(product.condition)) {
+
+			// Product condition filter (fallback to legacy "condition" if present)
+			const productCondition = product.product_condition ?? product.condition;
+			if (
+				selectedProductConditions.length > 0 &&
+				(!productCondition || !selectedProductConditions.includes(productCondition))
+			) {
 				return false;
 			}
-			
+
 			return true;
 		});
-		
+
 		// Then sort by relevance if there's a search query
 		if (searchQuery) {
 			filtered = filtered.sort((a, b) => {
@@ -129,7 +143,7 @@
 				return scoreB - scoreA; // Higher score first
 			});
 		}
-		
+
 		return filtered;
 	})();
 
@@ -138,20 +152,22 @@
 		updateFilters();
 	}
 
-	function toggleCategory(categoryId) {
-		if (selectedCategories.includes(categoryId)) {
-			selectedCategories = selectedCategories.filter(id => id !== categoryId);
+	function toggleMerchantProductCategory(categoryId) {
+		if (selectedMerchantProductCategoryIds.includes(categoryId)) {
+			selectedMerchantProductCategoryIds = selectedMerchantProductCategoryIds.filter(
+				(id) => id !== categoryId
+			);
 		} else {
-			selectedCategories = [...selectedCategories, categoryId];
+			selectedMerchantProductCategoryIds = [...selectedMerchantProductCategoryIds, categoryId];
 		}
 		updateFilters();
 	}
 
-	function toggleCondition(condition) {
-		if (selectedConditions.includes(condition)) {
-			selectedConditions = selectedConditions.filter(c => c !== condition);
+	function toggleProductCondition(condition) {
+		if (selectedProductConditions.includes(condition)) {
+			selectedProductConditions = selectedProductConditions.filter((c) => c !== condition);
 		} else {
-			selectedConditions = [...selectedConditions, condition];
+			selectedProductConditions = [...selectedProductConditions, condition];
 		}
 		updateFilters();
 	}
@@ -167,17 +183,17 @@
 	function updateFilters() {
 		const params = new URLSearchParams();
 		if (searchQuery) params.set('search', searchQuery);
-		if (selectedCategories.length > 0) params.set('category', selectedCategories.join(','));
+		if (selectedMerchantProductCategoryIds.length > 0) {
+			params.set('merchant_product_category', selectedMerchantProductCategoryIds.join(','));
+		}
 		if (priceRange.min > 0) params.set('minPrice', priceRange.min.toString());
 		if (priceRange.max < maxProductPrice) params.set('maxPrice', priceRange.max.toString());
-		if (selectedConditions.length > 0) params.set('condition', selectedConditions.join(','));
-		
+		if (selectedProductConditions.length > 0) {
+			params.set('product_condition', selectedProductConditions.join(','));
+		}
+
 		const queryString = params.toString();
 		goto(`/shop${queryString ? '?' + queryString : ''}`, { replaceState: true, noScroll: true });
-	}
-
-	function handleAddToCart(product) {
-		addItem(product);
 	}
 
 	function goToProduct(product) {
@@ -186,8 +202,11 @@
 
 	onMount(() => {
 		// Initialize filters from URL params
-		if (data.filters?.category) {
-			selectedCategories = data.filters.category.split(',').map(id => parseInt(id));
+		if (data.filters?.merchant_product_category) {
+			selectedMerchantProductCategoryIds = data.filters.merchant_product_category
+				.split(',')
+				.map((id) => parseInt(id, 10))
+				.filter((n) => !isNaN(n));
 		}
 		if (data.filters?.minPrice) {
 			const minPrice = parseFloat(data.filters.minPrice);
@@ -201,11 +220,11 @@
 				priceRange.max = maxPrice;
 			}
 		}
-		if (data.filters?.condition) {
-			selectedConditions = data.filters.condition.split(',');
+		if (data.filters?.product_condition) {
+			selectedProductConditions = data.filters.product_condition.split(',');
 		}
 	});
-	
+
 	// Update price range max when products load and ensure it's never undefined
 	$: if (maxProductPrice > 0 && products.length > 0) {
 		// If max is still at default (500) or undefined, or exceeds actual max, update it
@@ -219,7 +238,10 @@
 	}
 </script>
 
-<div class="relative flex h-auto min-h-screen w-full flex-col bg-gray-900 dark group/design-root overflow-x-hidden" style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(37,99,235)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;">
+<div
+	class="relative flex h-auto min-h-screen w-full flex-col bg-gray-900 dark group/design-root overflow-x-hidden"
+	style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(37,99,235)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;"
+>
 	<div class="layout-container flex h-full grow flex-col">
 		<div class="gap-1 px-6 flex flex-1 justify-center py-5">
 			<!-- Sidebar Filters -->
@@ -227,46 +249,65 @@
 				<div class="px-4 py-3">
 					<label class="flex flex-col min-w-40 h-12 w-full">
 						<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-							<div class="text-[#8ea3cc] flex border-none bg-[#212f4a] items-center justify-center pl-4 rounded-l-lg border-r-0" data-icon="MagnifyingGlass" data-size="24px" data-weight="regular">
-								<svg fill="currentColor" height="24px" viewBox="0 0 256 256" width="24px" xmlns="http://www.w3.org/2000/svg">
-									<path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+							<div
+								class="text-[#8ea3cc] flex border-none bg-[#212f4a] items-center justify-center pl-4 rounded-l-lg border-r-0"
+								data-icon="MagnifyingGlass"
+								data-size="24px"
+								data-weight="regular"
+							>
+								<svg
+									fill="currentColor"
+									height="24px"
+									viewBox="0 0 256 256"
+									width="24px"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
+									/>
 								</svg>
 							</div>
-							<input 
-								class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#212f4a] focus:border-none h-full placeholder:text-[#8ea3cc] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" 
-								placeholder="Search items" 
+							<input
+								class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border-none bg-[#212f4a] focus:border-none h-full placeholder:text-[#8ea3cc] px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+								placeholder="Search items"
 								value={searchQuery}
 								on:input={handleSearch}
 							/>
 						</div>
 					</label>
 				</div>
-				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Categories</h3>
+
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+					Categories
+				</h3>
 				<div class="px-4">
-					{#each categories as category (category.id)}
+					{#each merchantProductCategories as category (category.id)}
 						<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
-							<input 
-								class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none" 
+							<input
+								class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none"
 								type="checkbox"
-								checked={selectedCategories.includes(category.id)}
-								on:change={() => toggleCategory(category.id)}
+								checked={selectedMerchantProductCategoryIds.includes(category.id)}
+								on:change={() => toggleMerchantProductCategory(category.id)}
 							/>
 							<p class="text-white text-base font-normal leading-normal">{category.name}</p>
 						</label>
 					{/each}
 				</div>
-				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Price Range</h3>
+
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+					Price Range
+				</h3>
 				<div class="px-4">
 					<div class="@container">
-						<div class="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row">
+						<div
+							class="relative flex w-full flex-col items-start justify-between gap-3 p-4 @[480px]:flex-row"
+						>
 							<p class="text-white text-base font-medium leading-normal w-full shrink-[3]">Price</p>
 							<div class="flex h-[38px] w-full pt-1.5 relative">
-								<input 
-									type="range" 
-									min="0" 
-									max={maxProductPrice || 500} 
+								<input
+									type="range"
+									min="0"
+									max={maxProductPrice || 500}
 									step="10"
 									bind:value={priceRange.max}
 									on:input={updatePriceRange}
@@ -274,61 +315,70 @@
 								/>
 								<div class="flex h-1 w-full rounded-sm bg-[#2f436a] relative">
 									<div class="absolute left-0 -top-1.5 flex flex-col items-center gap-1">
-										<div class="size-4 rounded-full bg-[#1f68f9]"></div>
-										<p class="text-white text-sm font-normal leading-normal">RM {priceRange.min ?? 0}</p>
+										<div class="size-4 rounded-full bg-[#1f68f9]" />
+										<p class="text-white text-sm font-normal leading-normal">
+											{priceRange.min ?? 0} NST
+										</p>
 									</div>
-									<div 
+									<div
 										class="h-1 rounded-sm bg-[#1f68f9] absolute left-0 top-0"
-										style="width: {(maxProductPrice > 0 && priceRange.max) ? (priceRange.max / maxProductPrice) * 100 : 100}%"
-									></div>
-									<div 
+										style="width: {maxProductPrice > 0 && priceRange.max
+											? (priceRange.max / maxProductPrice) * 100
+											: 100}%"
+									/>
+									<div
 										class="absolute -left-3 -top-1.5 flex flex-col items-center gap-1"
-										style="left: {(maxProductPrice > 0 && priceRange.max) ? (priceRange.max / maxProductPrice) * 100 : 100}%"
+										style="left: {maxProductPrice > 0 && priceRange.max
+											? (priceRange.max / maxProductPrice) * 100
+											: 100}%"
 									>
-										<div class="size-4 rounded-full bg-[#1f68f9]"></div>
-										<p class="text-white text-sm font-normal leading-normal">RM {priceRange.max ?? maxProductPrice ?? 500}</p>
+										<div class="size-4 rounded-full bg-[#1f68f9]" />
+										<p class="text-white text-sm font-normal leading-normal">
+											{priceRange.max ?? maxProductPrice ?? 500} NST
+										</p>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-				
-				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Condition</h3>
+
+				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
+					Product Condition
+				</h3>
 				<div class="px-4">
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
-						<input 
-							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none" 
+						<input
+							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none"
 							type="checkbox"
-							checked={selectedConditions.includes('new')}
-							on:change={() => toggleCondition('new')}
+							checked={selectedProductConditions.includes('new')}
+							on:change={() => toggleProductCondition('new')}
 						/>
 						<p class="text-white text-base font-normal leading-normal">New</p>
 					</label>
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
-						<input 
-							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none" 
+						<input
+							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none"
 							type="checkbox"
-							checked={selectedConditions.includes('like_new')}
-							on:change={() => toggleCondition('like_new')}
+							checked={selectedProductConditions.includes('like_new')}
+							on:change={() => toggleProductCondition('like_new')}
 						/>
 						<p class="text-white text-base font-normal leading-normal">Like New</p>
 					</label>
 					<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
-						<input 
-							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none" 
+						<input
+							class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none"
 							type="checkbox"
-							checked={selectedConditions.includes('used')}
-							on:change={() => toggleCondition('used')}
+							checked={selectedProductConditions.includes('used')}
+							on:change={() => toggleProductCondition('used')}
 						/>
 						<p class="text-white text-base font-normal leading-normal">Used</p>
 					</label>
 				</div>
 			</div>
-			
+
 			<!-- Main Content -->
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-				
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
 					{#each filteredProducts as product (product.id)}
 						<button
@@ -337,11 +387,17 @@
 						>
 							<div
 								class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg"
-								style='background-image: url("{PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url || '/placeholder.png'}");'
-							></div>
+								style={`background-image: url("${
+									product.img_url
+										? PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url
+										: '/placeholder.png'
+								}");`}
+							/>
 							<div>
 								<p class="text-white text-base font-medium leading-normal">{product.name}</p>
-								<p class="text-[#8ea3cc] text-sm font-normal leading-normal">RM {product.retail_price}</p>
+								<p class="text-[#8ea3cc] text-sm font-normal leading-normal">
+									{product.retail_price} NST
+								</p>
 							</div>
 						</button>
 					{/each}
@@ -359,4 +415,3 @@
 <style>
 	@import url('https://fonts.googleapis.com/css2?display=swap&family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900');
 </style>
-
