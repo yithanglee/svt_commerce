@@ -1,25 +1,17 @@
 <script>
 	import { goto } from '$app/navigation';
-	import Header from '$lib/components/Header.svelte';
-    import { Alert } from "flowbite-svelte";
+	import { Alert } from 'flowbite-svelte';
 	import { postData } from '$lib/index.js';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
 	import { onMount } from 'svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
-    const user_id = data?.user_id || 0;
-	const navigationItems = [
-		{ label: 'Home', href: '/' },
-		{ label: 'Shop', href: '/shop' },
-		{ label: 'Sell', href: '/merchants/apply' },
-		{ label: 'Community', href: '/merchants' }
-	];
+	const user_id = data?.user_id || 0;
 
 	// Check if merchant already exists (non-reactive, just for checking)
 	const merchant = data?.merchant || {};
-    console.log('merchant', merchant);
-	
+	console.log('merchant', merchant);
 
 	// Form state - initialize with empty values
 	let formData = {
@@ -28,13 +20,23 @@
 		company_email: '',
 		company_phone: '',
 		company_reg_no: '',
-		company_ssm_image: null,
 		commission_perc: '',
 		description: '',
 		img_url: null, // Logo
 		bank_name: '',
 		bank_account_no: '',
 		bank_account_holder: '',
+		line_id: '',
+		facebook_url: '',
+		instagram_id: '',
+		twitter_url: '',
+		youtube_url: '',
+		tiktok_url: '',
+		pinterest_url: '',
+		linkedin_url: '',
+		github_url: '',
+		whatsapp_number: '',
+		wechat_number: '',
 		termsAccepted: false
 	};
 
@@ -52,11 +54,21 @@
 			formData.bank_name = merchant.bank_name || '';
 			formData.bank_account_no = merchant.bank_account_no || '';
 			formData.bank_account_holder = merchant.bank_account_holder || '';
+			formData.line_id = merchant.line_id || '';
+			formData.facebook_url = merchant.facebook_url || '';
+			formData.instagram_id = merchant.instagram_id || '';
+			formData.twitter_url = merchant.twitter_url || '';
+			formData.youtube_url = merchant.youtube_url || '';
+			formData.tiktok_url = merchant.tiktok_url || '';
+			formData.pinterest_url = merchant.pinterest_url || '';
+			formData.linkedin_url = merchant.linkedin_url || '';
+			formData.github_url = merchant.github_url || '';
+			formData.whatsapp_number = merchant.whatsapp_number || '';
+			formData.wechat_number = merchant.wechat_number || '';
 		}
 	});
-    let module = 'Merchant';
+	let module = 'Merchant';
 	let uploadedLogoFileName = '';
-	let uploadedSSMFileName = '';
 	let isSubmitting = false;
 	let errors = {};
 
@@ -86,17 +98,6 @@
 		}
 	}
 
-	function handleSSMImageChange(event) {
-		const file = event.target.files[0];
-		if (file) {
-			if (validateFile(file, 'company_ssm_image_url')) {
-				formData.company_ssm_image = file;
-				uploadedSSMFileName = file.name;
-				errors.company_ssm_image_url = '';
-			}
-		}
-	}
-
 	function validateForm() {
 		errors = {};
 		let isValid = true;
@@ -120,6 +121,11 @@
 			isValid = false;
 		}
 
+		if (!formData.company_phone.trim()) {
+			errors.company_phone = 'Company phone is required';
+			isValid = false;
+		}
+
 		if (!formData.company_reg_no.trim()) {
 			errors.company_reg_no = 'Company registration number is required';
 			isValid = false;
@@ -135,11 +141,6 @@
 			isValid = false;
 		}
 
-		if (!formData.company_ssm_image) {
-			errors.company_ssm_image_url = 'SSM image is required';
-			isValid = false;
-		}
-
 		if (!formData.termsAccepted) {
 			errors.termsAccepted = 'You must accept the terms and conditions';
 			isValid = false;
@@ -150,7 +151,7 @@
 
 	async function handleSubmit(event) {
 		event.preventDefault();
-		
+
 		if (!validateForm()) {
 			return;
 		}
@@ -158,7 +159,6 @@
 		isSubmitting = true;
 
 		try {
-         
 			// Get form element and create FormData
 			const form = document.getElementById('merchant-application-form');
 			const formDataToSubmit = new FormData(form);
@@ -186,45 +186,58 @@
 			goto('/');
 		}
 	}
-
-	function goToHome() {
-		goto('/');
-	}
 </script>
 
-<div class="relative flex h-auto min-h-screen w-full flex-col  bg-gray-900 dark:bg-background-dark group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
+<div
+	class="relative flex h-auto min-h-screen w-full flex-col bg-gray-900 dark:bg-background-dark group/design-root overflow-x-hidden"
+	style="font-family: Manrope, 'Noto Sans', sans-serif;"
+>
 	<div class="layout-container flex h-full grow flex-col">
 		<div class="px-4 sm:px-8 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-				
 				<main class="flex flex-col gap-8 py-10">
 					<div class="flex flex-wrap justify-between gap-3 p-4">
-						<p class="text-4xl font-black text-white leading-tight tracking-[-0.033em] min-w-72">Become a Merchant</p>
+						<p class="text-4xl font-black text-white leading-tight tracking-[-0.033em] min-w-72">
+							Become a Merchant
+						</p>
 					</div>
-                    {#if merchant && merchant.is_approved == false }
-                   
-                        <Alert color="yellow">
-                            <span class="font-medium">Your application is pending review. Please wait for approval.</span>
-                        </Alert>
-                      {/if}
+					{#if merchant && merchant.is_approved == false}
+						<Alert color="yellow">
+							<span class="font-medium"
+								>Your application is pending review. Please wait for approval.</span
+							>
+						</Alert>
+					{/if}
 
 					<div class="bg-black/10 dark:bg-gray-800/50 rounded-xl p-4 sm:p-8">
-						<form id="merchant-application-form" class="flex flex-col gap-6" on:submit={handleSubmit}>
+						<form
+							id="merchant-application-form"
+							class="flex flex-col gap-6"
+							on:submit={handleSubmit}
+						>
 							<input type="hidden" name="model" value={module} />
-                            <input type="hidden" name="Merchant[user_id]" value={user_id} />
-                            {#if merchant.id}
-                                <input type="hidden" name={module}[id] value={merchant.id} />
-                            {:else}
-                                <input type="hidden" name={module}[id] value={0} />
-                            {/if}
-                            <section>
-								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Company Information</h2>
+							<input type="hidden" name="Merchant[user_id]" value={user_id} />
+							{#if merchant.id}
+								<input type="hidden" name="{module}[id]" value={merchant.id} />
+							{:else}
+								<input type="hidden" name="{module}[id]" value={0} />
+							{/if}
+							<section>
+								<h2
+									class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+								>
+									Company Information
+								</h2>
 								<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Name <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Name <span class="text-red-500">*</span>
+										</p>
 										<input
-											name={module}[name]
-											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.name ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											name="{module}[name]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.name
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Company Name"
 											bind:value={formData.name}
 											type="text"
@@ -234,10 +247,14 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Company Email <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Company Email <span class="text-red-500">*</span>
+										</p>
 										<input
 											name="Merchant[company_email]"
-											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_email ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_email
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="company@example.com"
 											type="email"
 											bind:value={formData.company_email}
@@ -247,20 +264,31 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Company Phone</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Company Phone <span class="text-red-500">*</span>
+										</p>
 										<input
 											name="Merchant[company_phone]"
-											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_phone
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="+1 (555) 000-0000"
 											type="tel"
 											bind:value={formData.company_phone}
 										/>
+										{#if errors.company_phone}
+											<p class="text-red-500 text-sm mt-1">{errors.company_phone}</p>
+										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Company Registration Number <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Company Registration Number <span class="text-red-500">*</span>
+										</p>
 										<input
 											name="Merchant[company_reg_no]"
-											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_reg_no ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_reg_no
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 											placeholder="Registration Number"
 											bind:value={formData.company_reg_no}
 										/>
@@ -269,38 +297,51 @@
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base text-white font-medium leading-normal pb-2">Company Address <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Company Address <span class="text-red-500">*</span>
+										</p>
 										<textarea
 											name="Merchant[company_address]"
-											class="form-textarea text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_address ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[100px] p-[15px] text-base font-normal leading-normal"
+											class="form-textarea text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.company_address
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[100px] p-[15px] text-base font-normal leading-normal"
 											placeholder="Enter company address"
 											bind:value={formData.company_address}
-										></textarea>
+										/>
 										{#if errors.company_address}
 											<p class="text-red-500 text-sm mt-1">{errors.company_address}</p>
 										{/if}
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base text-white font-medium leading-normal pb-2">Description <span class="text-red-500">*</span></p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Description <span class="text-red-500">*</span>
+										</p>
 										<textarea
 											name="Merchant[description]"
-											class="form-textarea  text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.description ? 'border-red-500' : 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
+											class="form-textarea text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border {errors.description
+												? 'border-red-500'
+												: 'border-blue-700'} bg-gray-800 focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
 											placeholder="Describe your business..."
 											bind:value={formData.description}
-										></textarea>
+										/>
 										{#if errors.description}
 											<p class="text-red-500 text-sm mt-1">{errors.description}</p>
 										{/if}
 									</label>
-								
 								</div>
 							</section>
-							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
+							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4" />
 							<section>
-								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Banking Information</h2>
+								<h2
+									class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+								>
+									Crypto Wallet Information
+								</h2>
 								<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Bank Name</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Crypto Wallet Address
+										</p>
 										<input
 											name="Merchant[bank_name]"
 											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -309,7 +350,9 @@
 										/>
 									</label>
 									<label class="flex flex-col min-w-40 flex-1">
-										<p class="text-base text-white font-medium leading-normal pb-2">Account Number</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Crypto Wallet Address
+										</p>
 										<input
 											name="Merchant[bank_account_no]"
 											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -318,7 +361,9 @@
 										/>
 									</label>
 									<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
-										<p class="text-base text-white font-medium leading-normal pb-2">Account Holder Name</p>
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Crypto Wallet Address
+										</p>
 										<input
 											name="Merchant[bank_account_holder]"
 											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
@@ -328,21 +373,157 @@
 									</label>
 								</div>
 							</section>
-							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
+							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4" />
 							<section>
-								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Logo Upload</h2>
+								<h2
+									class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+								>
+									Social Contact (Optional)
+								</h2>
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">LINE ID</p>
+										<input
+											name="Merchant[line_id]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="line_id"
+											type="text"
+											bind:value={formData.line_id}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">Facebook URL</p>
+										<input
+											name="Merchant[facebook_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://facebook.com/..."
+											type="url"
+											bind:value={formData.facebook_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">Instagram ID</p>
+										<input
+											name="Merchant[instagram_id]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="instagram_id"
+											type="text"
+											bind:value={formData.instagram_id}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Twitter/X URL
+										</p>
+										<input
+											name="Merchant[twitter_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://x.com/..."
+											type="url"
+											bind:value={formData.twitter_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">YouTube URL</p>
+										<input
+											name="Merchant[youtube_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://youtube.com/..."
+											type="url"
+											bind:value={formData.youtube_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">TikTok URL</p>
+										<input
+											name="Merchant[tiktok_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://tiktok.com/@..."
+											type="url"
+											bind:value={formData.tiktok_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											Pinterest URL
+										</p>
+										<input
+											name="Merchant[pinterest_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://pinterest.com/..."
+											type="url"
+											bind:value={formData.pinterest_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">LinkedIn URL</p>
+										<input
+											name="Merchant[linkedin_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://linkedin.com/in/..."
+											type="url"
+											bind:value={formData.linkedin_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">GitHub URL</p>
+										<input
+											name="Merchant[github_url]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="https://github.com/..."
+											type="url"
+											bind:value={formData.github_url}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											WhatsApp Number
+										</p>
+										<input
+											name="Merchant[whatsapp_number]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="+6012..."
+											type="tel"
+											bind:value={formData.whatsapp_number}
+										/>
+									</label>
+									<label class="flex flex-col min-w-40 flex-1">
+										<p class="text-base text-white font-medium leading-normal pb-2">
+											WeChat Number
+										</p>
+										<input
+											name="Merchant[wechat_number]"
+											class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-gray-800 focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+											placeholder="wechat_number"
+											type="text"
+											bind:value={formData.wechat_number}
+										/>
+									</label>
+								</div>
+							</section>
+							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4" />
+							<section>
+								<h2
+									class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
+								>
+									Logo Upload
+								</h2>
 								<div class="p-4">
 									<label
-										class="flex flex-col items-center justify-center w-full h-64 border-2 {errors.img_url ? 'border-red-500' : 'border-blue-700'} border-dashed rounded-lg cursor-pointer bg-black/20 dark:bg-gray-800 hover:bg-black/30 dark:hover:bg-blue-800/60 transition-colors"
+										class="flex flex-col items-center justify-center w-full h-64 border-2 {errors.img_url
+											? 'border-red-500'
+											: 'border-blue-700'} border-dashed rounded-lg cursor-pointer bg-black/20 dark:bg-gray-800 hover:bg-black/30 dark:hover:bg-blue-800/60 transition-colors"
 										for="logo-upload"
 									>
 										<div class="flex flex-col items-center justify-center pt-5 pb-6">
-											<span class="material-symbols-outlined text-4xl mb-4 text-white	">cloud_upload</span>
+											<span class="material-symbols-outlined text-4xl mb-4 text-white"
+												>cloud_upload</span
+											>
 											{#if uploadedLogoFileName}
 												<p class="mb-2 text-sm font-semibold text-white">{uploadedLogoFileName}</p>
 											{:else}
 												<p class="mb-2 text-sm text-white">
-													<span class="font-semibold ">Click to upload</span> or drag and drop
+													<span class="font-semibold">Click to upload</span> or drag and drop
 												</p>
 											{/if}
 											<p class="text-xs text-white">JPG or PNG (MAX. 5MB)</p>
@@ -363,57 +544,31 @@
 									{/if}
 								</div>
 							</section>
-							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4"></div>
-							<section>
-								<h2 class="text-[22px] font-bold text-white leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">SSM Document Upload</h2>
-								<div class="p-4">
-									<label
-										class="flex flex-col items-center justify-center w-full h-64 border-2 {errors.company_ssm_image_url ? 'border-red-500' : 'border-blue-700'} border-dashed rounded-lg cursor-pointer bg-black/20 dark:bg-gray-800 hover:bg-black/30 dark:hover:bg-blue-800/60 transition-colors"
-										for="ssm-upload"
-									>
-										<div class="flex flex-col items-center justify-center pt-5 pb-6">
-											<span class="material-symbols-outlined text-4xl mb-4 text-white">cloud_upload</span>
-											{#if uploadedSSMFileName}
-												<p class="mb-2 text-sm font-semibold">{uploadedSSMFileName}</p>
-											{:else}
-												<p class="mb-2 text-sm text-white">
-													<span class="font-semibold">Click to upload</span> or drag and drop
-												</p>
-											{/if}
-											<p class="text-xs text-white">JPG or PNG (MAX. 5MB)</p>
-										</div>
-										<input
-											name="Merchant[company_ssm_image_url]"
-											class="hidden"
-											id="ssm-upload"
-											type="file"
-											accept=".jpg,.jpeg,.png"
-											on:change={handleSSMImageChange}
-										/>
-									</label>
-									{#if errors.company_ssm_image_url}
-										<p class="mt-2 text-sm text-red-500">{errors.company_ssm_image_url}</p>
-									{:else}
-										<p class="mt-2 text-sm text-white">Please upload a copy of your SSM document for verification.</p>
-									{/if}
-								</div>
-							</section>
-							<div class="px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-solid border-white/10 dark:border-t-[#223649] mt-6">
+							<div class="border-b border-solid border-white/10 dark:border-b-blue-800 my-4" />
+							<div
+								class="px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-6 border-t border-solid border-white/10 dark:border-t-[#223649] mt-6"
+							>
 								<div class="flex items-start">
 									<div class="flex items-center h-5">
 										<input
 											name="Merchant[terms_accepted]"
 											aria-describedby="terms"
-											class="w-4 h-4 border {errors.termsAccepted ? 'border-red-500' : 'border-blue-700'} rounded bg-gray-800 focus:ring-3 focus:ring-blue-600/50"
+											class="w-4 h-4 border {errors.termsAccepted
+												? 'border-red-500'
+												: 'border-blue-700'} rounded bg-gray-800 focus:ring-3 focus:ring-blue-600/50"
 											id="terms"
 											type="checkbox"
 											bind:checked={formData.termsAccepted}
 										/>
 									</div>
-									<div class="ml-3 text-sm text-white	">
+									<div class="ml-3 text-sm text-white">
 										<label class="font-light" for="terms">
 											I accept the
-											<button type="button" class="font-medium hover:underline bg-transparent border-none cursor-pointer p-0">Terms and Conditions</button>
+											<button
+												type="button"
+												class="font-medium hover:underline bg-transparent border-none cursor-pointer p-0"
+												>Terms and Conditions</button
+											>
 										</label>
 									</div>
 								</div>
@@ -434,7 +589,9 @@
 										type="submit"
 										disabled={isSubmitting}
 									>
-										<span class="truncate">{isSubmitting ? 'Submitting...' : 'Submit Application'}</span>
+										<span class="truncate"
+											>{isSubmitting ? 'Submitting...' : 'Submit Application'}</span
+										>
 									</button>
 								</div>
 							</div>

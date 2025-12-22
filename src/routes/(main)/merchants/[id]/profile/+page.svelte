@@ -48,6 +48,27 @@
 	let orderStatusFilter = 'All';
 	let isUpdatingStatus = false;
 
+	// Merchant Profile form state (crypto wallet + social contact)
+	let merchantProfileSubmitting = false;
+	let merchantProfileError = '';
+	const merchantModule = 'Merchant';
+	let merchantProfileForm = {
+		bank_name: '',
+		bank_account_no: '',
+		bank_account_holder: '',
+		line_id: '',
+		facebook_url: '',
+		instagram_id: '',
+		twitter_url: '',
+		youtube_url: '',
+		tiktok_url: '',
+		pinterest_url: '',
+		linkedin_url: '',
+		github_url: '',
+		whatsapp_number: '',
+		wechat_number: ''
+	};
+
 	// Form state
 	let formData = {
 		name: '',
@@ -134,7 +155,7 @@
 
 	// Debounce search query to avoid too many API calls
 	let searchTimeout;
-	$: if (activeTab === 'listings' && !isInitialLoad) {
+	$: if (activeTab === 'dashboard' && !isInitialLoad) {
 		clearTimeout(searchTimeout);
 		searchTimeout = setTimeout(() => {
 			fetchProducts();
@@ -142,13 +163,29 @@
 	}
 
 	// Watch status filter changes
-	$: if (activeTab === 'listings' && statusFilter && !isInitialLoad) {
+	$: if (activeTab === 'dashboard' && statusFilter && !isInitialLoad) {
 		fetchProducts();
 	}
 
 	// Mark initial load as complete after component mounts
 	onMount(() => {
 		isInitialLoad = false;
+
+		// Initialize merchant profile form from loaded merchant record
+		merchantProfileForm.bank_name = merchant.bank_name || '';
+		merchantProfileForm.bank_account_no = merchant.bank_account_no || '';
+		merchantProfileForm.bank_account_holder = merchant.bank_account_holder || '';
+		merchantProfileForm.line_id = merchant.line_id || '';
+		merchantProfileForm.facebook_url = merchant.facebook_url || '';
+		merchantProfileForm.instagram_id = merchant.instagram_id || '';
+		merchantProfileForm.twitter_url = merchant.twitter_url || '';
+		merchantProfileForm.youtube_url = merchant.youtube_url || '';
+		merchantProfileForm.tiktok_url = merchant.tiktok_url || '';
+		merchantProfileForm.pinterest_url = merchant.pinterest_url || '';
+		merchantProfileForm.linkedin_url = merchant.linkedin_url || '';
+		merchantProfileForm.github_url = merchant.github_url || '';
+		merchantProfileForm.whatsapp_number = merchant.whatsapp_number || '';
+		merchantProfileForm.wechat_number = merchant.wechat_number || '';
 	});
 
 	// Use products directly (no client-side filtering needed since API handles it)
@@ -278,8 +315,8 @@
 
 	function setActiveTab(tab) {
 		activeTab = tab;
-		// When switching to listings tab, fetch products if search/filter is active
-		if (tab === 'listings' && (searchQuery || statusFilter !== 'All')) {
+		// Listings are shown in the dashboard. When switching back, refresh if search/filter is active.
+		if (tab === 'dashboard' && ((searchQuery && searchQuery.trim()) || statusFilter !== 'All')) {
 			fetchProducts();
 		}
 	}
@@ -518,6 +555,32 @@
 			isSubmitting = false;
 		}
 	}
+
+	async function handleMerchantProfileSubmit(event) {
+		event.preventDefault();
+		merchantProfileSubmitting = true;
+		merchantProfileError = '';
+
+		try {
+			const form = document.getElementById('merchant-profile-form');
+			const formDataToSubmit = new FormData(form);
+			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+
+			await postData(formDataToSubmit, {
+				isFormData: true,
+				endpoint: url + `/svt_api/${merchantModule}`,
+				successCallback: async () => {
+					await invalidate('/merchants/' + merchant_id + '/profile');
+					await invalidateAll();
+				}
+			});
+		} catch (error) {
+			console.error('Error updating merchant profile:', error);
+			merchantProfileError = 'Failed to update profile. Please try again.';
+		} finally {
+			merchantProfileSubmitting = false;
+		}
+	}
 </script>
 
 <div
@@ -566,32 +629,6 @@
 									</svg>
 								</div>
 								<p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-							</button>
-							<button
-								on:click={() => setActiveTab('listings')}
-								class="flex items-center gap-3 px-3 py-2 rounded-lg {activeTab === 'listings'
-									? 'bg-[#223649]'
-									: ''} hover:bg-[#223649] transition-colors cursor-pointer"
-							>
-								<div
-									class="text-white"
-									data-icon="ListBullets"
-									data-size="24px"
-									data-weight="regular"
-								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg"
-										width="24px"
-										height="24px"
-										fill="currentColor"
-										viewBox="0 0 256 256"
-									>
-										<path
-											d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z"
-										/>
-									</svg>
-								</div>
-								<p class="text-white text-sm font-medium leading-normal">Listings</p>
 							</button>
 							<button
 								on:click={() => setActiveTab('orders')}
@@ -659,7 +696,7 @@
 										/>
 									</svg>
 								</div>
-								<p class="text-white text-sm font-medium leading-normal">Settings</p>
+								<p class="text-white text-sm font-medium leading-normal">Merchant Profile</p>
 							</button>
 							<!--- logout button --->
 							<button
@@ -744,135 +781,7 @@
 						</div>
 					</div>
 
-					<!-- Recent Activity -->
-					<h2
-						class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5"
-					>
-						Recent Activity
-					</h2>
-					<div class="px-4 py-3 @container">
-						<div class="flex overflow-hidden rounded-lg border border-[#314d68] bg-[#101a23]">
-							<table class="flex-1">
-								<thead>
-									<tr class="bg-[#182634]">
-										<th
-											class="table-column-120 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal"
-											>Item</th
-										>
-										<th
-											class="table-column-240 px-4 py-3 text-left text-white w-60 text-sm font-medium leading-normal"
-											>Status</th
-										>
-										<th
-											class="table-column-360 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal"
-											>Price</th
-										>
-										<th
-											class="table-column-480 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal"
-											>Image Preview</th
-										>
-										<th
-											class="table-column-600 px-4 py-3 text-left text-white w-60 text-[#90adcb] text-sm font-medium leading-normal"
-										>
-											Actions
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									{#each products.slice(0, 5) as product}
-										<tr class="border-t border-t-[#314d68]">
-											<td
-												class="table-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal"
-											>
-												{product.name || '-'}
-											</td>
-											<td
-												class="table-column-240 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal"
-											>
-												<button
-													class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#223649] text-white text-sm font-medium leading-normal w-full"
-												>
-													<span class="truncate">{getStatus(product)}</span>
-												</button>
-											</td>
-											<td
-												class="table-column-360 h-[72px] px-4 py-2 w-[400px] text-[#90adcb] text-sm font-normal leading-normal"
-											>
-												{formatPrice(product.retail_price)}
-											</td>
-											<td class="table-column-480 h-[72px] px-4 py-2 w-[400px]">
-												{#if product.img_url}
-													<img
-														src={product.img_url.startsWith('http')
-															? product.img_url
-															: PHX_HTTP_PROTOCOL + PHX_ENDPOINT + product.img_url}
-														alt={product.name || 'Product image'}
-														class="w-16 h-16 object-cover rounded-lg border border-[#314d68]"
-													/>
-												{:else}
-													<div
-														class="w-16 h-16 bg-gray-700 rounded-lg border border-[#314d68] flex items-center justify-center"
-													>
-														<span class="text-gray-500 text-xs">No image</span>
-													</div>
-												{/if}
-											</td>
-											<td
-												class="table-column-600 h-[72px] px-4 py-2 w-60 text-[#90adcb] text-sm font-bold leading-normal tracking-[0.015em] cursor-pointer"
-												on:click={() => goto(`/products/${product.id}`)}
-											>
-												View
-											</td>
-										</tr>
-									{:else}
-										<tr>
-											<td colspan="5" class="px-4 py-8 text-center text-[#90adcb] text-sm"
-												>No listings found</td
-											>
-										</tr>
-									{/each}
-								</tbody>
-							</table>
-						</div>
-						<style>
-							@container (max-width:120px) {
-								.table-column-120 {
-									display: none;
-								}
-							}
-							@container (max-width:240px) {
-								.table-column-240 {
-									display: none;
-								}
-							}
-							@container (max-width:360px) {
-								.table-column-360 {
-									display: none;
-								}
-							}
-							@container (max-width:480px) {
-								.table-column-480 {
-									display: none;
-								}
-							}
-							@container (max-width:600px) {
-								.table-column-600 {
-									display: none;
-								}
-							}
-						</style>
-					</div>
-
-					<!-- Add New Listing Button -->
-					<div class="flex px-4 py-3 justify-end">
-						<button
-							class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0d80f2] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-							on:click={openAddProductModal}
-						>
-							<span class="truncate">Add New Listing</span>
-						</button>
-					</div>
-				{:else if activeTab === 'listings'}
+					<!-- Listings (moved from the old Listings tab) -->
 					<div class="flex flex-col gap-4 p-4">
 						<p class="text-white tracking-light text-[32px] font-bold leading-tight">My Listings</p>
 						<p class="text-[#90adcb] text-sm font-normal leading-normal">
@@ -1252,14 +1161,204 @@
 				{:else if activeTab === 'settings'}
 					<div class="flex flex-wrap justify-between gap-3 p-4">
 						<div class="flex min-w-72 flex-col gap-3">
-							<p class="text-white tracking-light text-[32px] font-bold leading-tight">Settings</p>
+							<p class="text-white tracking-light text-[32px] font-bold leading-tight">
+								Merchant Profile
+							</p>
 							<p class="text-[#90adcb] text-sm font-normal leading-normal">
-								Configure your merchant settings.
+								Update your crypto wallet address and social contact details.
 							</p>
 						</div>
 					</div>
-					<div class="flex items-center justify-center p-8">
-						<p class="text-[#90adcb] text-base">Settings content placeholder</p>
+					<div class="p-4">
+						<div class="bg-[#223649] rounded-xl p-4 sm:p-8">
+							{#if merchantProfileError}
+								<p class="text-red-400 text-sm mb-4">{merchantProfileError}</p>
+							{/if}
+
+							<form
+								id="merchant-profile-form"
+								class="flex flex-col gap-6"
+								on:submit={handleMerchantProfileSubmit}
+							>
+								<input type="hidden" name="model" value={merchantModule} />
+								<input type="hidden" name="Merchant[id]" value={merchant.id || merchant_id || 0} />
+								{#if merchant.user_id}
+									<input type="hidden" name="Merchant[user_id]" value={merchant.user_id} />
+								{/if}
+
+								<section>
+									<h2
+										class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-2 pb-3 pt-2"
+									>
+										Crypto Wallet Address
+									</h2>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									
+									
+										<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
+										
+											<input
+												name="Merchant[bank_account_holder]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="Wallet address"
+												type="text"
+												bind:value={merchantProfileForm.bank_account_no}
+											/>
+										</label>
+									</div>
+								</section>
+
+								<div class="border-b border-solid border-white/10 my-2" />
+
+								<section>
+									<h2
+										class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-2 pb-3 pt-2"
+									>
+										Social Contact (Optional)
+									</h2>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">LINE ID</p>
+											<input
+												name="Merchant[line_id]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="line_id"
+												type="text"
+												bind:value={merchantProfileForm.line_id}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												Facebook URL
+											</p>
+											<input
+												name="Merchant[facebook_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://facebook.com/..."
+												type="url"
+												bind:value={merchantProfileForm.facebook_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												Instagram ID
+											</p>
+											<input
+												name="Merchant[instagram_id]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="instagram_id"
+												type="text"
+												bind:value={merchantProfileForm.instagram_id}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												Twitter/X URL
+											</p>
+											<input
+												name="Merchant[twitter_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://x.com/..."
+												type="url"
+												bind:value={merchantProfileForm.twitter_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												YouTube URL
+											</p>
+											<input
+												name="Merchant[youtube_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://youtube.com/..."
+												type="url"
+												bind:value={merchantProfileForm.youtube_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">TikTok URL</p>
+											<input
+												name="Merchant[tiktok_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://tiktok.com/@..."
+												type="url"
+												bind:value={merchantProfileForm.tiktok_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												Pinterest URL
+											</p>
+											<input
+												name="Merchant[pinterest_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://pinterest.com/..."
+												type="url"
+												bind:value={merchantProfileForm.pinterest_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												LinkedIn URL
+											</p>
+											<input
+												name="Merchant[linkedin_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://linkedin.com/in/..."
+												type="url"
+												bind:value={merchantProfileForm.linkedin_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">GitHub URL</p>
+											<input
+												name="Merchant[github_url]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="https://github.com/..."
+												type="url"
+												bind:value={merchantProfileForm.github_url}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												WhatsApp Number
+											</p>
+											<input
+												name="Merchant[whatsapp_number]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="+6012..."
+												type="tel"
+												bind:value={merchantProfileForm.whatsapp_number}
+											/>
+										</label>
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												WeChat Number
+											</p>
+											<input
+												name="Merchant[wechat_number]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
+												placeholder="wechat_number"
+												type="text"
+												bind:value={merchantProfileForm.wechat_number}
+											/>
+										</label>
+									</div>
+								</section>
+
+								<div class="flex justify-end pt-2">
+									<button
+										type="submit"
+										disabled={merchantProfileSubmitting}
+										class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-6 bg-[#0d80f2] text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0b6fd1] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+									>
+										<span class="truncate"
+											>{merchantProfileSubmitting ? 'Saving...' : 'Save Changes'}</span
+										>
+									</button>
+								</div>
+							</form>
+						</div>
 					</div>
 				{:else if activeTab === 'help'}
 					<div class="flex flex-wrap justify-between gap-3 p-4">

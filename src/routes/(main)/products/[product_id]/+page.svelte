@@ -1,6 +1,5 @@
 <script>
 	import { goto, invalidateAll } from '$app/navigation';
-	import { addItem } from '$lib/stores/cart';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
 	
 	/** @type {import('./$types').PageData} */
@@ -10,6 +9,7 @@
 	$: product = data.product;
 	$: relatedProducts = data.relatedProducts || [];
 	$: category = data.category;
+	$: merchant = data.merchant || {};
 	
 	// Product images - use img_url as main, could be extended to support multiple images
 	$: productImages = (() => {
@@ -51,17 +51,9 @@
 		selectedImage = imageUrl;
 	}
 	
-	function handleAddToCart() {
-		if (product) {
-			addItem(product);
-		}
-	}
-	
 	function handleBuyNow() {
-		if (product) {
-			addItem(product);
-			goto('/cart');
-		}
+		const merchantId = product?.merchant_id;
+		if (merchantId != null) goto(`/merchants/${merchantId}/products`);
 	}
 	
 	async function goToProduct(productId) {
@@ -84,6 +76,14 @@
 		if (!imgUrl) return '/placeholder.png';
 		if (imgUrl.startsWith('http')) return imgUrl;
 		return PHX_HTTP_PROTOCOL + PHX_ENDPOINT + imgUrl;
+	}
+
+	async function copyToClipboard(text) {
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch (e) {
+			console.error('copy failed', e);
+		}
 	}
 </script>
 
@@ -161,17 +161,98 @@
 					<div class="flex justify-stretch">
 						<div class="flex flex-1 gap-3 flex-wrap py-3 justify-start">
 							<button 
-								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0d80f2] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#0b6cc9] transition-colors"
-								on:click={handleAddToCart}
-							>
-								<span class="truncate">Add to Cart</span>
-							</button>
-							<button 
-								class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#223649] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#2a4555] transition-colors"
+								class="flex min-w-[220px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0d80f2] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#0b6cc9] transition-colors"
 								on:click={handleBuyNow}
+								disabled={!product?.merchant_id}
 							>
-								<span class="truncate">Buy Now</span>
+								<span class="truncate">Buy Now (Contact Merchant)</span>
 							</button>
+						</div>
+					</div>
+
+					<!-- Barter Contact Info -->
+					<div class="mt-6 rounded-lg bg-[#101a23] border border-white/10 p-4">
+						<h2 class="text-white text-[18px] font-bold leading-tight tracking-[-0.015em] pb-2">
+							Contact & Wallet (Barter)
+						</h2>
+						<p class="text-[#90adcb] text-sm font-normal leading-normal pb-4">
+							Use these details to contact the merchant and complete the barter process.
+						</p>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">Merchant</p>
+								<p class="text-white text-sm">{merchant?.name || product?.merchant_name || '-'}</p>
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">Wallet Address</p>
+								{#if merchant?.bank_account_no}
+									<div class="flex items-center gap-2">
+										<p class="text-white text-sm break-all flex-1">{merchant.bank_account_no}</p>
+										<button
+											class="rounded-lg h-9 px-3 bg-[#223649] text-white text-xs font-bold hover:bg-[#2a4555] transition-colors"
+											on:click={() => copyToClipboard(merchant.bank_account_no)}
+										>
+											Copy
+										</button>
+									</div>
+								{:else}
+									<p class="text-white text-sm">-</p>
+								{/if}
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">WhatsApp</p>
+								{#if merchant?.whatsapp_number}
+									<a class="text-white text-sm underline hover:text-[#0d80f2]" href={`https://wa.me/${String(merchant.whatsapp_number).replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer">
+										{merchant.whatsapp_number}
+									</a>
+								{:else}
+									<p class="text-white text-sm">-</p>
+								{/if}
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">LINE ID</p>
+								<p class="text-white text-sm">{merchant?.line_id || '-'}</p>
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">WeChat</p>
+								<p class="text-white text-sm">{merchant?.wechat_number || '-'}</p>
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">Twitter/X</p>
+								{#if merchant?.twitter_url}
+									<a class="text-white text-sm underline hover:text-[#0d80f2]" href={merchant.twitter_url} target="_blank" rel="noreferrer">
+										{merchant.twitter_url}
+									</a>
+								{:else}
+									<p class="text-white text-sm">-</p>
+								{/if}
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">Facebook</p>
+								{#if merchant?.facebook_url}
+									<a class="text-white text-sm underline hover:text-[#0d80f2]" href={merchant.facebook_url} target="_blank" rel="noreferrer">
+										{merchant.facebook_url}
+									</a>
+								{:else}
+									<p class="text-white text-sm">-</p>
+								{/if}
+							</div>
+
+							<div>
+								<p class="text-[#90adcb] text-xs font-medium pb-1">Instagram</p>
+								{#if merchant?.instagram_id}
+									<p class="text-white text-sm">{merchant.instagram_id}</p>
+								{:else}
+									<p class="text-white text-sm">-</p>
+								{/if}
+							</div>
 						</div>
 					</div>
 					

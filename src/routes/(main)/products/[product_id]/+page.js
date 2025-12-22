@@ -19,6 +19,14 @@ export async function load({ params, fetch }) {
 		
 		// Find the product by ID
 		const product = allProducts.find(p => p.id == product_id) || null;
+
+		// Fetch merchant profile (contact + wallet) for barter process
+		const merchant =
+			product?.merchant_id != null
+				? await api_get(url, { scope: 'merchant_profile', merchant_id: product.merchant_id }).catch(
+						() => null
+					)
+				: null;
 		
 		// Get related products (same category or random if no category match)
 		let relatedProducts = [];
@@ -41,6 +49,7 @@ export async function load({ params, fetch }) {
 		console.log('product prep', product) ;
 		return {
 			product: product || null,
+			merchant: merchant || null,
 			relatedProducts: relatedProducts.slice(0, 3),
 			category: category || null
 		};
@@ -48,6 +57,7 @@ export async function load({ params, fetch }) {
 		console.error('Error loading product:', error);
 		return {
 			product: null,
+			merchant: null,
 			relatedProducts: [],
 			category: null
 		};
