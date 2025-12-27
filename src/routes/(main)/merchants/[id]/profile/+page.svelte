@@ -1220,7 +1220,7 @@
 										<label class="flex flex-col min-w-40 flex-1 md:col-span-2">
 										
 											<input
-												name="Merchant[bank_account_holder]"
+												name="Merchant[bank_account_no]"
 												class="form-input text-white flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 h-14 p-[15px] text-base font-normal leading-normal"
 												placeholder="Wallet address"
 												type="text"
