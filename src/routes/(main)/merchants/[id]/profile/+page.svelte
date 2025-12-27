@@ -153,6 +153,26 @@
 		}
 	}
 
+
+	async function deleteProduct(productId) {
+		try {
+			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+			await postData({ id: productId }, {method: 'DELETE',
+				endpoint: url + `/svt_api/MerchantProduct/${productId}`,
+				successCallback: async () => {
+					// Refresh products
+					await invalidate('/merchants/' + merchant_id + '/profile');
+					// Reload page data
+					await invalidateAll();
+					await fetchProducts();
+				}
+			});	
+		} catch (error) {
+			console.error('Error deleting product:', error);
+			alert('Failed to delete product. Please try again.');
+		}
+	}
+
 	// Debounce search query to avoid too many API calls
 	let searchTimeout;
 	$: if (activeTab === 'dashboard' && !isInitialLoad) {
@@ -170,6 +190,8 @@
 	// Mark initial load as complete after component mounts
 	onMount(() => {
 		isInitialLoad = false;
+
+		console.log('merchant', merchant);
 
 		// Initialize merchant profile form from loaded merchant record
 		merchantProfileForm.bank_name = merchant.bank_name || '';
@@ -981,7 +1003,7 @@
 													<button
 														class="text-red-500 hover:underline cursor-pointer bg-transparent border-none p-0"
 														on:click={() => {
-															/* TODO: Implement delete */
+															deleteProduct(product.id);
 														}}
 													>
 														Delete
