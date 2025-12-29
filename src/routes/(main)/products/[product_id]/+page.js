@@ -23,9 +23,7 @@ export async function load({ params, fetch }) {
 		// Fetch merchant profile (contact + wallet) for barter process
 		const merchant =
 			product?.merchant_id != null
-				? await api_get(url, { scope: 'merchant_profile', merchant_id: product.merchant_id }).catch(
-						() => null
-					)
+				? api_get(url, { scope: 'model_get_by', model: 'Merchant', id: 	product?.merchant_id }).catch(() => null)
 				: null;
 		
 		// Get related products (same category or random if no category match)

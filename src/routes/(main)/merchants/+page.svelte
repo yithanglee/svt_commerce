@@ -35,6 +35,7 @@
 		draw: '1',
 		length: itemsPerPage,
 		model: 'Merchant',
+		is_approved: true,
 		columns: { 0: { data: 'id', name: 'id' } },
 		order: { 0: { column: 0, dir: 'desc' } },
 		preloads: JSON.stringify(['user', 'merchant_category']),
@@ -44,7 +45,7 @@
 	function buildSearchString() {
 		if (searchQuery.trim()) {
 			// Search across name, email, and phone
-			return `a.name=${searchQuery.trim()}|a.company_email=${searchQuery.trim()}|a.company_phone=${searchQuery.trim()}`;
+			return `a.is_approved=true|a.name=${searchQuery.trim()}|a.company_email=${searchQuery.trim()}|a.company_phone=${searchQuery.trim()}`;
 		}
 		return null;
 	}

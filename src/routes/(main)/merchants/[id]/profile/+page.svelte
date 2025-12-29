@@ -13,6 +13,8 @@
 	const merchantProductCategories = data.merchant_product_categories || [];
 	$: stats = data.stats || { activeListings: 0, pendingOrders: 0, totalSales: 0, earnings: '0.00' };
 
+	const phxBaseUrl = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+
 	function getProductConditionLabel(value) {
 		const v = String(value || '').toLowerCase();
 		if (v === 'new') return 'New';
@@ -52,7 +54,12 @@
 	let merchantProfileSubmitting = false;
 	let merchantProfileError = '';
 	const merchantModule = 'Merchant';
+	let merchantProfileUploadedImageName = '';
+	let merchantProfileImageError = '';
+	let merchantProfileImagePreviewUrl = '';
+	let merchantProfileImagePreviewObjectUrl = '';
 	let merchantProfileForm = {
+		img_url: null,
 		bank_name: '',
 		bank_account_no: '',
 		bank_account_holder: '',
@@ -68,6 +75,53 @@
 		whatsapp_number: '',
 		wechat_number: ''
 	};
+
+	function getAbsoluteImageUrl(imgUrl) {
+		if (!imgUrl) return '';
+		if (String(imgUrl).startsWith('http')) return String(imgUrl);
+		return phxBaseUrl + String(imgUrl);
+	}
+
+	function getMerchantAvatarUrl() {
+		// Some pages use `merchant.logo`, others use `merchant.img_url` (DB field).
+		return getAbsoluteImageUrl(merchant?.logo || merchant?.img_url || '');
+	}
+
+	function validateMerchantProfileImage(file) {
+		if (!file) return false;
+		if (file.size > 5 * 1024 * 1024) {
+			merchantProfileImageError = 'File size must be less than 5MB';
+			return false;
+		}
+		const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+		if (!validTypes.includes(file.type)) {
+			merchantProfileImageError = 'File must be JPG or PNG';
+			return false;
+		}
+		return true;
+	}
+
+	function handleMerchantProfileImageChange(event) {
+		const file = event?.target?.files?.[0];
+		merchantProfileImageError = '';
+
+		if (!file) return;
+		if (!validateMerchantProfileImage(file)) return;
+
+		merchantProfileForm.img_url = file;
+		merchantProfileUploadedImageName = file.name;
+
+		// Preview selected image
+		if (merchantProfileImagePreviewObjectUrl) {
+			try {
+				URL.revokeObjectURL(merchantProfileImagePreviewObjectUrl);
+			} catch {
+				// ignore
+			}
+		}
+		merchantProfileImagePreviewObjectUrl = URL.createObjectURL(file);
+		merchantProfileImagePreviewUrl = merchantProfileImagePreviewObjectUrl;
+	}
 
 	// Form state
 	let formData = {
@@ -208,6 +262,11 @@
 		merchantProfileForm.github_url = merchant.github_url || '';
 		merchantProfileForm.whatsapp_number = merchant.whatsapp_number || '';
 		merchantProfileForm.wechat_number = merchant.wechat_number || '';
+
+		// Show current image label (if any). Preview uses `merchant.img_url` directly in template.
+		if (merchant?.img_url || merchant?.logo) {
+			merchantProfileUploadedImageName = 'Current image';
+		}
 	});
 
 	// Use products directly (no client-side filtering needed since API handles it)
@@ -586,7 +645,7 @@
 		try {
 			const form = document.getElementById('merchant-profile-form');
 			const formDataToSubmit = new FormData(form);
-			const url = PHX_HTTP_PROTOCOL + PHX_ENDPOINT;
+			const url = phxBaseUrl;
 
 			await postData(formDataToSubmit, {
 				isFormData: true,
@@ -616,10 +675,10 @@
 				<div class="flex h-full min-h-[700px] flex-col justify-between bg-[#101a23] p-4">
 					<div class="flex flex-col gap-4">
 						<div class="flex gap-3">
-							{#if merchant.logo}
+							{#if getMerchantAvatarUrl()}
 								<div
 									class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-									style="background-image: url('{merchant.logo}');"
+									style="background-image: url('{getMerchantAvatarUrl()}');"
 								/>
 							{:else}
 								<div
@@ -1207,6 +1266,70 @@
 								{#if merchant.user_id}
 									<input type="hidden" name="Merchant[user_id]" value={merchant.user_id} />
 								{/if}
+
+								<section>
+									<h2
+										class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-2 pb-3 pt-2"
+									>
+										Merchant Image
+									</h2>
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+										<div class="md:col-span-2">
+											{#if merchantProfileImageError}
+												<p class="text-red-400 text-sm mb-2">{merchantProfileImageError}</p>
+											{/if}
+
+											{#if merchantProfileImagePreviewUrl}
+												<div class="mb-3">
+													<p class="text-xs text-[#90adcb] mb-2">Preview:</p>
+													<img
+														src={merchantProfileImagePreviewUrl}
+														alt="Selected merchant"
+														class="w-24 h-24 object-cover rounded-lg border border-[#314d68]"
+													/>
+												</div>
+											{:else if merchant?.img_url || merchant?.logo}
+												<div class="mb-3">
+													<p class="text-xs text-[#90adcb] mb-2">Current image:</p>
+													<img
+														src={getAbsoluteImageUrl(merchant?.img_url || merchant?.logo)}
+														alt="Current merchant"
+														class="w-24 h-24 object-cover rounded-lg border border-[#314d68]"
+													/>
+												</div>
+											{/if}
+
+											<label
+												class="flex flex-col items-center justify-center w-full h-40 border-2 border-[#314d68] border-dashed rounded-lg cursor-pointer bg-[#101a23] hover:bg-[#182634] transition-colors"
+												for="merchant-img-upload"
+											>
+												<div class="flex flex-col items-center justify-center pt-2 pb-2">
+													<span class="material-symbols-outlined text-2xl text-gray-400 mb-2"
+														>cloud_upload</span
+													>
+													{#if merchantProfileUploadedImageName}
+														<p class="mb-1 text-xs text-white font-semibold">
+															{merchantProfileUploadedImageName}
+														</p>
+													{:else}
+														<p class="mb-1 text-xs text-gray-400">Click to upload</p>
+													{/if}
+													<p class="text-xs text-gray-500">JPG or PNG (MAX. 5MB)</p>
+												</div>
+												<input
+													name="Merchant[img_url]"
+													class="hidden"
+													id="merchant-img-upload"
+													type="file"
+													accept=".jpg,.jpeg,.png"
+													on:change={handleMerchantProfileImageChange}
+												/>
+											</label>
+										</div>
+									</div>
+								</section>
+
+								<div class="border-b border-solid border-white/10 my-2" />
 
 								<section>
 									<h2

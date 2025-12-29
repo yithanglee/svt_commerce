@@ -54,6 +54,13 @@
 	function getMerchantDescription() {
 		return merchant.description || merchant.remarks || 'Curated collection of unique products.';
 	}
+
+	function getMerchantAvatar() {
+		const imgUrl = merchant.img_url;
+		if (!imgUrl) return '/placeholder.png';
+		if (imgUrl.startsWith('http')) return imgUrl;
+		return url + imgUrl;
+	}
 	
 	// Filter and sort products
 	$: filteredProducts = (() => {
@@ -147,6 +154,12 @@
 					<div class="absolute inset-0 bg-cover bg-center" style='background-image: url("{getBannerImage()}");'></div>
 					<div class="absolute inset-0 bg-black/50"></div>
 					<div class="relative h-full flex flex-col justify-center items-center text-center p-8">
+						<img
+							src={getMerchantAvatar()}
+							alt={`${getMerchantName()} avatar`}
+							class="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover border-4 border-white/20 shadow-lg mb-4"
+							loading="lazy"
+						/>
 						<h1 class="text-white text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em]">
 							{getMerchantName()}
 						</h1>

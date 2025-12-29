@@ -8,7 +8,7 @@ export async function load(event) {
 	const merchant_id = params.id;
 	
 	const [merchant, banners, allProducts] = await Promise.all([
-		api_get(url, { scope: 'merchant_profile', merchant_id }).catch(() => null),
+		api_get(url, { scope: 'model_get_by', model: 'Merchant', id: merchant_id }).catch(() => null),
 		api_get(url, { scope: 'merchant_banners', merchant_id }).catch(() => []),
 		api_get(url, {
 			scope: 'datatable', 
