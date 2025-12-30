@@ -17,17 +17,35 @@ export async function load({ url: urlObj }) {
 	const product_condition =
 		searchParams.get('product_condition') || searchParams.get('condition') || '';
 
+	// Pagination (DataTables params expected by backend)
+	const perPage = 15;
+	const pageParam = searchParams.get('page') || '1';
+	const page = Math.max(1, parseInt(pageParam, 10) || 1);
+	const start = perPage * (page - 1);
+
+	const additionalSearch = [{ column: 'is_approved', value: true, prefix: 'b', operator: '=' }, { column: 'name', value: true, prefix: 'a', operator: 'not_null' }];
+	if (search) {
+		additionalSearch.push({ column: 'name', value: search, prefix: 'a', operator: 'ilike' });
+	}
+
 	// Fetch products and merchant product categories
 	const [productsRes, categoriesRes] = await Promise.all([
-		api_get(url, { scope: 'datatable', model: 'MerchantProduct', limit: 12, 
+		api_get(url, {
+			scope: 'datatable',
+			model: 'MerchantProduct',
+			length: perPage,
+			start,
 			additional_joins: JSON.stringify([{ join_suffix: 'a', assoc: 'merchant', prefix: 'b' }]),
-			additional_search: JSON.stringify([{ column: 'is_approved', value: true, prefix: 'b', operator: '=' }]) }).catch(() => []),
-		api_get(url, { scope: 'datatable', model: 'MerchantProductCategory', limit: 200 }).catch(
+			additional_search: JSON.stringify(additionalSearch)
+		}).catch(() => []),
+		api_get(url, { scope: 'datatable', model: 'MerchantProductCategory', length: 200, start: 0 }).catch(
 			() => []
 		)
 	]);
 
 	const products = productsRes?.data && Array.isArray(productsRes.data) ? productsRes.data : [];
+	const total = typeof productsRes?.recordsTotal === 'number' ? productsRes.recordsTotal : 0;
+	const totalPages = Math.max(1, Math.ceil(total / perPage));
 	const categories =
 		categoriesRes?.data && Array.isArray(categoriesRes.data)
 			? categoriesRes.data
@@ -38,6 +56,13 @@ export async function load({ url: urlObj }) {
 	return {
 		products,
 		categories,
+		pagination: {
+			page,
+			perPage,
+			start,
+			total,
+			totalPages
+		},
 		filters: {
 			search,
 			merchant_product_category,

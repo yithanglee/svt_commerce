@@ -2,13 +2,19 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
+	import { formatNETSPH } from '$lib/utils/format';
 	/** @type {import('./$types').PageData} */
 	export let data;
 
-	let products = data.products || [];
-	let merchantProductCategories = data.categories || [];
+	// Keep these reactive so navigation (e.g. ?page=2) refreshes the UI
+	$: products = data.products || [];
+	$: merchantProductCategories = data.categories || [];
+
 	let searchQuery = data.filters?.search || '';
 	let selectedMerchantProductCategoryIds = [];
+
+	$: currentPage = data.pagination?.page || 1;
+	$: totalPages = data.pagination?.totalPages || 1;
 
 	// Calculate max price from products or use default
 	$: maxProductPrice =
@@ -191,9 +197,31 @@
 		if (selectedProductConditions.length > 0) {
 			params.set('product_condition', selectedProductConditions.join(','));
 		}
+		// Reset pagination when filters change
+		params.set('page', '1');
 
 		const queryString = params.toString();
 		goto(`/shop${queryString ? '?' + queryString : ''}`, { replaceState: true, noScroll: true });
+	}
+
+	function goToPage(page) {
+		const next = Math.max(1, Math.min(totalPages, page));
+		const params = new URLSearchParams(window.location.search);
+		params.set('page', String(next));
+		const queryString = params.toString();
+		goto(`/shop${queryString ? '?' + queryString : ''}`, { noScroll: true });
+	}
+
+	function goToCategory(categoryId) {
+		const params = new URLSearchParams(window.location.search);
+		// Use legacy param name requested
+		params.set('category', String(categoryId));
+		// Avoid conflicting param names
+		params.delete('merchant_product_category');
+		// Reset pagination
+		params.set('page', '1');
+		const queryString = params.toString();
+		goto(`/shop${queryString ? '?' + queryString : ''}`, { noScroll: true });
 	}
 
 	function goToProduct(product) {
@@ -280,8 +308,9 @@
 				<h3 class="text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
 					Categories
 				</h3>
-				<div class="px-4">
-					{#each merchantProductCategories as category (category.id)}
+				<!-- Scrollable list to keep sidebar within viewport height -->
+				<div class="px-4 max-h-[45vh] overflow-y-auto">
+					{#each merchantProductCategories as category, idx (`${category?.id ?? 'null'}-${idx}`)}
 						<label class="flex gap-x-3 py-3 flex-row cursor-pointer">
 							<input
 								class="h-5 w-5 rounded border-[#2f436a] border-2 bg-transparent text-[#1f68f9] checked:bg-[#1f68f9] checked:border-[#1f68f9] checked:bg-[image:--checkbox-tick-svg] focus:ring-0 focus:ring-offset-0 focus:border-[#2f436a] focus:outline-none"
@@ -289,7 +318,13 @@
 								checked={selectedMerchantProductCategoryIds.includes(category.id)}
 								on:change={() => toggleMerchantProductCategory(category.id)}
 							/>
-							<p class="text-white text-base font-normal leading-normal">{category.name}</p>
+							<a
+								class="text-white text-base font-normal leading-normal hover:underline text-left"
+								href={`/shop?category=${category.id}&page=1`}
+								on:click|preventDefault|stopPropagation={() => goToCategory(category.id)}
+							>
+								{category.name}
+							</a>
 						</label>
 					{/each}
 				</div>
@@ -317,7 +352,7 @@
 									<div class="absolute left-0 -top-1.5 flex flex-col items-center gap-1">
 										<div class="size-4 rounded-full bg-[#1f68f9]" />
 										<p class="text-white text-sm font-normal leading-normal">
-											{priceRange.min ?? 0} NETSPH
+											{formatNETSPH(priceRange.min ?? 0, { decimals: 0 })}
 										</p>
 									</div>
 									<div
@@ -334,7 +369,7 @@
 									>
 										<div class="size-4 rounded-full bg-[#1f68f9]" />
 										<p class="text-white text-sm font-normal leading-normal">
-											{priceRange.max ?? maxProductPrice ?? 500} NETSPH
+											{formatNETSPH(priceRange.max ?? maxProductPrice ?? 500, { decimals: 0 })}
 										</p>
 									</div>
 								</div>
@@ -380,7 +415,7 @@
 			<!-- Main Content -->
 			<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
 				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-					{#each filteredProducts as product (product.id)}
+					{#each filteredProducts as product, idx (`${product?.id ?? 'null'}-${idx}`)}
 						<button
 							on:click={() => goToProduct(product)}
 							class="flex flex-col gap-3 pb-3 cursor-pointer hover:opacity-90 transition-opacity text-left"
@@ -396,12 +431,44 @@
 							<div>
 								<p class="text-white text-base font-medium leading-normal">{product.name}</p>
 								<p class="text-[#8ea3cc] text-sm font-normal leading-normal">
-									{product.retail_price} NETSPH
+									{formatNETSPH(product.retail_price, { decimals: 2 })}
 								</p>
 							</div>
 						</button>
 					{/each}
 				</div>
+				{#if totalPages > 1}
+					<div class="flex items-center justify-center gap-2 px-4 pb-6">
+						<button
+							class="px-3 py-2 rounded-lg bg-[#212f4a] text-white disabled:opacity-50"
+							on:click={() => goToPage(currentPage - 1)}
+							disabled={currentPage <= 1}
+						>
+							Prev
+						</button>
+
+						<div class="flex items-center gap-1">
+							{#each Array(totalPages) as _, i (i)}
+								<button
+									class="px-3 py-2 rounded-lg {currentPage === i + 1
+										? 'bg-[#1f68f9] text-white'
+										: 'bg-[#212f4a] text-white'}"
+									on:click={() => goToPage(i + 1)}
+								>
+									{i + 1}
+								</button>
+							{/each}
+						</div>
+
+						<button
+							class="px-3 py-2 rounded-lg bg-[#212f4a] text-white disabled:opacity-50"
+							on:click={() => goToPage(currentPage + 1)}
+							disabled={currentPage >= totalPages}
+						>
+							Next
+						</button>
+					</div>
+				{/if}
 				{#if filteredProducts.length === 0}
 					<div class="flex justify-center items-center py-12">
 						<p class="text-[#8ea3cc] text-lg">No products found matching your filters.</p>

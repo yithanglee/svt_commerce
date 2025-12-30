@@ -2,13 +2,18 @@
 	import { addItem } from '$lib/stores/cart';
 	import { goto } from '$app/navigation';
 	import { PHX_HTTP_PROTOCOL, PHX_ENDPOINT } from '$lib/constants';
+	import { formatNETSPH } from '$lib/utils/format';
 	import Header from '$lib/components/Header.svelte';
 	/** @type {import('./$types').PageData} */
 	export let data;
-	
-	let slides = Array.isArray(data.slides) ? data.slides : [];
-	let categories = Array.isArray(data.categories) ? data.categories : [];
-	let products = Array.isArray(data.products) ? data.products.slice(0, 8) : [];
+
+	// Keep these reactive so navigation (e.g. ?page=2) refreshes the UI
+	$: slides = Array.isArray(data.slides) ? data.slides : [];
+	$: categories = Array.isArray(data.categories) ? data.categories : [];
+	$: products = Array.isArray(data.products) ? data.products : [];
+
+	$: currentPage = data.pagination?.page || 1;
+	$: totalPages = data.pagination?.totalPages || 1;
 	
 	// Get hero image from first slide or use default
 	$: heroImage = slides.length > 0 
@@ -21,6 +26,14 @@
 	
 	function goToShop() {
 		goto('/shop');
+	}
+
+	function goToPage(page) {
+		const next = Math.max(1, Math.min(totalPages, page));
+		const params = new URLSearchParams(window.location.search);
+		params.set('page', String(next));
+		const queryString = params.toString();
+		goto(`/${queryString ? '?' + queryString : ''}`, { noScroll: true });
 	}
 	
 	const navigationItems = [
@@ -80,26 +93,24 @@
 				
 				<!-- Shop by Category -->
 				<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Shop by Category</h2>
-				<div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-					{#each categories.slice(0, 6) as category (category.id)}
-						<button
-							on:click={() => goto('/shop?category=' + category.id)}
-							class="flex flex-col gap-3 pb-3"
-						>
-							<div
-								class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg"
-								style='background-image: url("{category.img_url || '/placeholder.png'}");'
-							></div>
-							<p class="text-white text-base font-medium leading-normal">{category.name}</p>
-						</button>
-					{/each}
+				<div class="px-4 pb-2">
+					<div class="category-scroll flex flex-nowrap gap-2 overflow-x-auto overflow-y-hidden pb-3">
+						{#each categories as category, idx (`${category?.id ?? 'null'}-${idx}`)}
+							<button
+								on:click={() => goto(`/shop?category=${category.id}&page=1`)}
+								class="shrink-0 px-3 py-2 rounded-full bg-[#223c49] text-white text-sm font-semibold hover:bg-[#2a4855] transition-colors"
+							>
+								{category.name}
+							</button>
+						{/each}
+					</div>
 				</div>
 				
 				<!-- Featured Listings -->
 				<h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Listings</h2>
 				<div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 					<div class="flex items-stretch p-4 gap-3">
-						{#each products as product (product.id)}
+						{#each products as product, idx (`${product?.id ?? 'null'}-${idx}`)}
 							<button
 								on:click={() => goto('/shop')}
 								class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60 cursor-pointer hover:opacity-90 transition-opacity"
@@ -111,12 +122,46 @@
 								<div>
 									<p class="text-white text-base font-medium leading-normal">{product.name}</p>
 									<p class="text-[#90b7cb] text-sm font-normal leading-normal">{product.desc || 'Excellent condition'}</p>
-									<p class="text-white text-sm font-semibold leading-normal mt-1">NETSPH {product.retail_price}</p>
+									<p class="text-white text-sm font-semibold leading-normal mt-1">
+										{formatNETSPH(product.retail_price, { decimals: 2, position: 'prefix' })}
+									</p>
 								</div>
 							</button>
 						{/each}
 					</div>
 				</div>
+				{#if totalPages > 1}
+					<div class="flex items-center justify-center gap-2 px-4 pb-10">
+						<button
+							class="px-3 py-2 rounded-lg bg-[#223c49] text-white disabled:opacity-50"
+							on:click={() => goToPage(currentPage - 1)}
+							disabled={currentPage <= 1}
+						>
+							Prev
+						</button>
+
+						<div class="flex items-center gap-1">
+							{#each Array(totalPages) as _, i (i)}
+								<button
+									class="px-3 py-2 rounded-lg {currentPage === i + 1
+										? 'bg-[#0da6f2] text-white'
+										: 'bg-[#223c49] text-white'}"
+									on:click={() => goToPage(i + 1)}
+								>
+									{i + 1}
+								</button>
+							{/each}
+						</div>
+
+						<button
+							class="px-3 py-2 rounded-lg bg-[#223c49] text-white disabled:opacity-50"
+							on:click={() => goToPage(currentPage + 1)}
+							disabled={currentPage >= totalPages}
+						>
+							Next
+						</button>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -124,4 +169,20 @@
 
 <style>
 	@import url('https://fonts.googleapis.com/css2?display=swap&family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900');
+
+	/* Visible horizontal scrollbar for categories */
+	.category-scroll::-webkit-scrollbar {
+		height: 10px;
+	}
+	.category-scroll::-webkit-scrollbar-track {
+		background: #0f172a;
+		border-radius: 999px;
+	}
+	.category-scroll::-webkit-scrollbar-thumb {
+		background: #223c49;
+		border-radius: 999px;
+	}
+	.category-scroll::-webkit-scrollbar-thumb:hover {
+		background: #2a4855;
+	}
 </style>
