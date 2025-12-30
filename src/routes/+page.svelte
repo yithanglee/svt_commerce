@@ -111,7 +111,7 @@
 								<div>
 									<p class="text-white text-base font-medium leading-normal">{product.name}</p>
 									<p class="text-[#90b7cb] text-sm font-normal leading-normal">{product.desc || 'Excellent condition'}</p>
-									<p class="text-white text-sm font-semibold leading-normal mt-1">NST {product.retail_price}</p>
+									<p class="text-white text-sm font-semibold leading-normal mt-1">NETSPH {product.retail_price}</p>
 								</div>
 							</button>
 						{/each}

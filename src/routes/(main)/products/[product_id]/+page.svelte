@@ -154,7 +154,7 @@
 					
 					<!-- Price -->
 					<h1 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] text-left pb-3 pt-5">
-						 {(parseFloat(product.retail_price) || 0).toFixed(2)} NST
+						 {(parseFloat(product.retail_price) || 0).toFixed(2)} NETSPH
 					</h1>
 					
 					<!-- Action Buttons -->
@@ -316,7 +316,7 @@
 								></div>
 								<div>
 									<p class="text-white text-base font-medium leading-normal">{relatedProduct.name}</p>
-									<p class="text-[#90adcb] text-sm font-normal leading-normal">{(parseFloat(relatedProduct.retail_price) || 0).toFixed(2)} NST</p>
+									<p class="text-[#90adcb] text-sm font-normal leading-normal">{(parseFloat(relatedProduct.retail_price) || 0).toFixed(2)} NETSPH</p>
 								</div>
 							</button>
 						{/each}

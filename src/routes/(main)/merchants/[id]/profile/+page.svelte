@@ -60,6 +60,7 @@
 	let merchantProfileImagePreviewObjectUrl = '';
 	let merchantProfileForm = {
 		img_url: null,
+		description: '',
 		bank_name: '',
 		bank_account_no: '',
 		bank_account_holder: '',
@@ -251,6 +252,7 @@
 		merchantProfileForm.bank_name = merchant.bank_name || '';
 		merchantProfileForm.bank_account_no = merchant.bank_account_no || '';
 		merchantProfileForm.bank_account_holder = merchant.bank_account_holder || '';
+		merchantProfileForm.description = merchant.description || merchant.remarks || '';
 		merchantProfileForm.line_id = merchant.line_id || '';
 		merchantProfileForm.facebook_url = merchant.facebook_url || '';
 		merchantProfileForm.instagram_id = merchant.instagram_id || '';
@@ -291,8 +293,8 @@
 	}
 
 	function formatPrice(price) {
-		if (!price) return '0 NST';
-		return `${parseFloat(price).toFixed(2)} NST`;
+		if (!price) return '0 NETSPH';
+		return `${parseFloat(price).toFixed(2)} NETSPH`;
 	}
 
 	function getStatusBadgeClass(status) {
@@ -857,7 +859,7 @@
 						<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#223649]">
 							<p class="text-white text-base font-medium leading-normal">Earnings</p>
 							<p class="text-white tracking-light text-2xl font-bold leading-tight">
-								{stats.earnings} NST
+								{stats.earnings} NETSPH
 							</p>
 						</div>
 					</div>
@@ -1326,6 +1328,30 @@
 												/>
 											</label>
 										</div>
+									</div>
+								</section>
+
+								<div class="border-b border-solid border-white/10 my-2" />
+
+								<section>
+									<h2
+										class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-2 pb-3 pt-2"
+									>
+										About
+									</h2>
+									<div class="grid grid-cols-1 gap-6">
+										<label class="flex flex-col min-w-40 flex-1">
+											<p class="text-base text-white font-medium leading-normal pb-2">
+												Description
+											</p>
+											<textarea
+												name="Merchant[description]"
+												class="form-input text-white flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg focus:outline-0 focus:ring-2 focus:ring-blue-600/50 border border-blue-700 bg-[#101a23] focus:border-blue-600 min-h-[120px] p-[15px] text-base font-normal leading-normal"
+												placeholder="Tell customers about your store..."
+												rows="5"
+												bind:value={merchantProfileForm.description}
+											/>
+										</label>
 									</div>
 								</section>
 

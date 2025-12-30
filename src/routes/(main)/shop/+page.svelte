@@ -317,7 +317,7 @@
 									<div class="absolute left-0 -top-1.5 flex flex-col items-center gap-1">
 										<div class="size-4 rounded-full bg-[#1f68f9]" />
 										<p class="text-white text-sm font-normal leading-normal">
-											{priceRange.min ?? 0} NST
+											{priceRange.min ?? 0} NETSPH
 										</p>
 									</div>
 									<div
@@ -334,7 +334,7 @@
 									>
 										<div class="size-4 rounded-full bg-[#1f68f9]" />
 										<p class="text-white text-sm font-normal leading-normal">
-											{priceRange.max ?? maxProductPrice ?? 500} NST
+											{priceRange.max ?? maxProductPrice ?? 500} NETSPH
 										</p>
 									</div>
 								</div>
@@ -396,7 +396,7 @@
 							<div>
 								<p class="text-white text-base font-medium leading-normal">{product.name}</p>
 								<p class="text-[#8ea3cc] text-sm font-normal leading-normal">
-									{product.retail_price} NST
+									{product.retail_price} NETSPH
 								</p>
 							</div>
 						</button>

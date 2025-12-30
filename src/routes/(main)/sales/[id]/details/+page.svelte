@@ -77,8 +77,8 @@
 	}
 	
 	function formatPrice(price) {
-		if (!price && price !== 0) return '0 NST';
-		return ` ${parseFloat(price).toFixed(2)} NST`;
+		if (!price && price !== 0) return '0 NETSPH';
+		return ` ${parseFloat(price).toFixed(2)} NETSPH`;
 	}
 	
 	function formatDateTime(dateString) {

@@ -119,7 +119,7 @@
 	
 	function formatPrice(price) {
 		const numPrice = parseFloat(price) || 0;
-		return `${numPrice.toFixed(2)} NST`;
+		return `${numPrice.toFixed(2)} NETSPH`;
 	}
 	
 	function goToProduct(productId) {
