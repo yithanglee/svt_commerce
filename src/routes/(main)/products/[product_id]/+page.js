@@ -9,16 +9,17 @@ export async function load({ params, fetch }) {
 	
 	try {
 		// Fetch product details and related data
-		const [allProductsRes, categoriesRes] = await Promise.all([
+		const [allProductsRes, categoriesRes, productRes] = await Promise.all([
 			api_get(url, { scope: 'datatable', model: 'MerchantProduct', limit: 100 }).catch(() => []),
-			api_get(url, { scope: 'ecommerce_categories' }).catch(() => [])
+			api_get(url, { scope: 'ecommerce_categories' }).catch(() => []),
+			api_get(url, { scope: 'model_get_by', model: 'MerchantProduct', id: product_id }).catch(() => null)
 		]);
 		
 		const allProducts = (allProductsRes?.data && Array.isArray(allProductsRes.data)) ? allProductsRes.data : [];
 		const categories = Array.isArray(categoriesRes) ? categoriesRes : [];
 		
 		// Find the product by ID
-		const product = allProducts.find(p => p.id == product_id) || null;
+		const product = productRes || null;
 
 		// Fetch merchant profile (contact + wallet) for barter process
 		const merchant =
