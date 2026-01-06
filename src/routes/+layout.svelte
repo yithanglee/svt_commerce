@@ -21,10 +21,12 @@
 		{ label: 'Home', href: '/' },
 		{ label: 'Shop', href: '/shop' },
 		{ label: 'Sell', href: '/merchants/apply' },
+		{ label: 'Posting Manual', href: '/seller-posting-manual-policy' },
 		{ label: 'Community', href: '/merchants' }
 	];
 
-	$: isHomePage = $page.url.pathname === '/';
+	const headerHiddenPaths = new Set(['/']);
+	$: isHeaderHidden = headerHiddenPaths.has($page.url.pathname);
 
 	function logOut() {
 		session.logout();
@@ -54,8 +56,8 @@
 	</Toast>
 </div>
 
-{#if !isHomePage}
-	<Header 
+{#if !isHeaderHidden}
+	<Header
 		showSearch={true}
 		showWishlist={true}
 		showApplyMerchant={true}
